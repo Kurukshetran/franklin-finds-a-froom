@@ -1,3 +1,11 @@
+*.csproj
+*.dwlt
 *.meta
+*.sln
+*.userprefs
+Library/assetDatabase3
+Library/guidmapper
+Library/expandedItems
 Library/metadata/
+Library/ScriptAssemblies/
 Temp/
