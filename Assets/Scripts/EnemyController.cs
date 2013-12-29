@@ -9,6 +9,9 @@ public class EnemyController : MonoBehaviour {
 
 	// Magnitude of the bounce when enemy is disabled
 	public float disableBounceVelocity = 10f;
+
+	// Time the enemy remains disabled
+	public float disabledTime = 5f;
 	#endregion
 
 	#region Private
@@ -17,6 +20,8 @@ public class EnemyController : MonoBehaviour {
 
 	// If true, enemy movement is to the right.
 	private bool directionToRight = true;
+
+	private float disabledTimer;
 
 	private enum EnemyState {
 		NORMAL,
@@ -33,10 +38,26 @@ public class EnemyController : MonoBehaviour {
 		animator = renderObject.GetComponent<Animator>();
 	}
 
+	void Update() {
+		if (currState == EnemyState.DISABLED) {
+			disabledTimer -= Time.deltaTime;
+
+			if (disabledTimer <= 0) {
+				animator.SetBool("Disabled", false);
+				currState = EnemyState.NORMAL;
+				nextState = EnemyState.NORMAL;
+			}
+		}
+	}
+
 	void FixedUpdate() {
 		int dir = this.directionToRight ? 1 : -1;
-		float enemySpeed = speed * dir;
-		rigidbody2D.velocity = new Vector2(transform.localScale.x * enemySpeed, rigidbody2D.velocity.y);
+		float mag = speed;
+		if (currState == EnemyState.DISABLED)
+			mag = 0;
+
+		float velocity = mag * dir;
+		rigidbody2D.velocity = new Vector2(transform.localScale.x * velocity, rigidbody2D.velocity.y);
 
 		if (this.directionToRight && transform.eulerAngles.y != 180) {
 			transform.eulerAngles = new Vector3(0, 180f, 0);
@@ -45,9 +66,11 @@ public class EnemyController : MonoBehaviour {
 		if (nextState == EnemyState.DISABLED && currState != EnemyState.DISABLED) {
 			currState = EnemyState.DISABLED;
 
-			// Stop forward motion and trigger disabled animation
-			speed = 0;
+			// Trigger disabled animation
 			animator.SetBool("Disabled", true);
+
+			// Start the disabled timer
+			disabledTimer = disabledTime;
 		}
 	}
 
@@ -57,5 +80,22 @@ public class EnemyController : MonoBehaviour {
 
 	public void SetDisabled() {
 		nextState = EnemyState.DISABLED;
+	}
+
+	void OnCollisionEnter2D(Collision2D coll) {
+		if (coll.gameObject.tag == "Player" && currState == EnemyState.DISABLED) {
+			collider2D.enabled = false;
+			rigidbody2D.gravityScale = 2f;
+			rigidbody2D.velocity = new Vector2(0, 20f);
+			speed = 0;
+			currState = EnemyState.DEAD;
+			nextState = EnemyState.DEAD;
+
+			Invoke("Destroy", 2);
+		}
+	}
+
+	void Destroy() {
+		Destroy(this.gameObject);
 	}
 }
