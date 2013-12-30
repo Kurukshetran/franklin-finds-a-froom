@@ -130,5 +130,10 @@ public class PlayerController : MonoBehaviour {
 
 	public void TriggerDeath() {
 		transform.position = respawnLocation.transform.position;
+
+		// Reset camera position
+		GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
+		CameraController cameraController = camera.GetComponent<CameraController>();
+		cameraController.ResetPosition();
 	}
 }
