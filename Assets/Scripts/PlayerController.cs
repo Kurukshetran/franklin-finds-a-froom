@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviour {
 
 	// Gravity scale when player is floating to the ground
 	public float gravityScaleFloating;
+
+	public GameObject respawnLocation;
 	#endregion
 
 	#region Private
@@ -30,6 +32,8 @@ public class PlayerController : MonoBehaviour {
 	private Transform groundCheck;
 
 	private bool doJump;
+
+	private bool doStompBounce;
 
 	private bool isRunning;
 	#endregion
@@ -103,5 +107,28 @@ public class PlayerController : MonoBehaviour {
 			// Apply force for the jump
 			rigidbody2D.AddForce(new Vector2(0, jumpForce));
 		}
+
+		// Create bounce effect after stomping on an enemy
+		if (doStompBounce) {
+			doStompBounce = false;
+
+			int xForce = 0;
+			if (transform.forward.x > 0) {
+				xForce = 1;
+			}
+			else if (transform.forward.x < 0) {
+				xForce = -1;
+			}
+
+			rigidbody2D.AddForce(new Vector2(walkJumpForce / 3 * xForce, walkJumpForce * 2));
+		}
+	}
+
+	public void OnEnemyStomp() {
+		doStompBounce = true;
+	}
+
+	public void TriggerDeath() {
+		transform.position = respawnLocation.transform.position;
 	}
 }

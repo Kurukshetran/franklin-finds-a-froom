@@ -83,15 +83,29 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {
-		if (coll.gameObject.tag == "Player" && currState == EnemyState.DISABLED) {
-			collider2D.enabled = false;
-			rigidbody2D.gravityScale = 2f;
-			rigidbody2D.velocity = new Vector2(0, 20f);
-			speed = 0;
-			currState = EnemyState.DEAD;
-			nextState = EnemyState.DEAD;
+		if (coll.gameObject.tag == "Player") {
+		    if (currState == EnemyState.NORMAL) {
+				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 
-			Invoke("Destroy", 2);
+				if (coll.contacts[0].normal.y == -1 && coll.relativeVelocity.y > 0) {
+					SetDisabled();
+
+					pc.OnEnemyStomp();
+				}
+				else {
+					pc.TriggerDeath();
+				}
+			}
+		    else if (currState == EnemyState.DISABLED) {
+				collider2D.enabled = false;
+				rigidbody2D.gravityScale = 2f;
+				rigidbody2D.velocity = new Vector2(0, 20f);
+				speed = 0;
+				currState = EnemyState.DEAD;
+				nextState = EnemyState.DEAD;
+
+				Invoke("Destroy", 2);
+			}
 		}
 	}
 
