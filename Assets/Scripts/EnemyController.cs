@@ -12,6 +12,9 @@ public class EnemyController : MonoBehaviour {
 
 	// Time the enemy remains disabled
 	public float disabledTime = 5f;
+
+	// Time the enemy is immune from player collision at beginning of the disabled state
+	public float disabledImmuneTime = 1f;
 	#endregion
 
 	#region Private
@@ -21,11 +24,14 @@ public class EnemyController : MonoBehaviour {
 	// If true, enemy movement is to the right.
 	private bool directionToRight = true;
 
+	// Timers for managing disabled states.
 	private float disabledTimer;
+	private float disabledImmuneTimer;
 
 	private enum EnemyState {
 		NORMAL,
 		DISABLED,
+		DISABLED_IMMUNE,
 		DEAD
 	};
 
@@ -39,7 +45,18 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	void Update() {
-		if (currState == EnemyState.DISABLED) {
+		if (currState == EnemyState.DISABLED_IMMUNE) {
+			disabledImmuneTimer -= Time.deltaTime;
+
+			if (disabledImmuneTimer <= 0) {
+				currState = EnemyState.DISABLED;
+				nextState = EnemyState.DISABLED;
+
+				// Start the disabled timer
+				disabledTimer = disabledTime;
+			}
+		}
+		else if (currState == EnemyState.DISABLED) {
 			disabledTimer -= Time.deltaTime;
 
 			if (disabledTimer <= 0) {
@@ -53,7 +70,7 @@ public class EnemyController : MonoBehaviour {
 	void FixedUpdate() {
 		int dir = this.directionToRight ? 1 : -1;
 		float mag = speed;
-		if (currState == EnemyState.DISABLED)
+		if (currState == EnemyState.DISABLED || currState == EnemyState.DISABLED_IMMUNE)
 			mag = 0;
 
 		float velocity = mag * dir;
@@ -63,14 +80,15 @@ public class EnemyController : MonoBehaviour {
 			transform.eulerAngles = new Vector3(0, 180f, 0);
 		}
 
-		if (nextState == EnemyState.DISABLED && currState != EnemyState.DISABLED) {
-			currState = EnemyState.DISABLED;
+		if (nextState == EnemyState.DISABLED_IMMUNE && 
+		    (currState != EnemyState.DISABLED_IMMUNE && currState != EnemyState.DISABLED)) {
+			currState = EnemyState.DISABLED_IMMUNE;
 
 			// Trigger disabled animation
 			animator.SetBool("Disabled", true);
 
-			// Start the disabled timer
-			disabledTimer = disabledTime;
+			// Start the disabled immune timer
+			disabledImmuneTimer = disabledImmuneTime;
 		}
 	}
 
@@ -79,7 +97,7 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	public void SetDisabled() {
-		nextState = EnemyState.DISABLED;
+		nextState = EnemyState.DISABLED_IMMUNE;
 	}
 
 	void OnCollisionEnter2D(Collision2D coll) {

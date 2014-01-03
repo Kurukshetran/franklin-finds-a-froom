@@ -35,6 +35,8 @@ public class PlayerController : MonoBehaviour {
 
 	private bool doStompBounce;
 
+	private bool ignoreInput;
+
 	private bool isRunning;
 	#endregion
 
@@ -45,6 +47,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Update() {
+		if (ignoreInput)
+			return;
+
 		float hMovement = Input.GetAxis("Horizontal");
 
 		// Set "Speed" on the animator for the controller to apply the animation if needed
@@ -129,7 +134,26 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void TriggerDeath() {
+		// Trigger death animation. Respawn after a few seconds.
+		animator.SetBool("Dead", true);
+		Invoke("Respawn", 4);
+
+		// Ignore user input
+		ignoreInput = true;
+
+		// Set to a layer for enemies to not collide with
+		gameObject.layer = 10; // "EnemyIgnore"
+	}
+
+	public void Respawn() {
+		animator.SetBool("Dead", false);
 		transform.position = respawnLocation.transform.position;
+
+		// Re-enable input
+		ignoreInput = false;
+
+		// Reset layer to allow enemy collisions
+		gameObject.layer = 0; // "Default"
 
 		// Reset camera position
 		GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
