@@ -116,7 +116,6 @@ public class EnemyController : MonoBehaviour {
 			}
 		    else if (currState == EnemyState.DISABLED) {
 				collider2D.enabled = false;
-				rigidbody2D.gravityScale = 2f;
 				rigidbody2D.velocity = new Vector2(0, 20f);
 				speed = 0;
 				currState = EnemyState.DEAD;

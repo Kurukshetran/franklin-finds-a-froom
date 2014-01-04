@@ -16,16 +16,28 @@ public class PlayerController : MonoBehaviour {
 	// Force the player jumps with while running
 	public float runJumpForce;
 
+	// Force applied to player after stomping on enemy
+	public float stompBounceForce;
+
 	// Normal gravity scale of player falling to the ground
 	public float gravityScaleNormal;
 
 	// Gravity scale when player is floating to the ground
 	public float gravityScaleFloating;
 
+	// Time to delay respawn on death
+	public int respawnDelay = 4;
+	#endregion
+
+	#region References to other GameObjects
+	// Location to respawn at
 	public GameObject respawnLocation;
 	#endregion
 
 	#region Private
+	// Game controller
+	private GameController gameController;
+
 	// Player's Animator component
 	private Animator animator;
 
@@ -42,6 +54,8 @@ public class PlayerController : MonoBehaviour {
 
 	void Awake() {
 		animator = this.GetComponent<Animator>();
+
+		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
 		groundCheck = transform.Find("groundCheck");
 	}
@@ -125,7 +139,7 @@ public class PlayerController : MonoBehaviour {
 				xForce = -1;
 			}
 
-			rigidbody2D.AddForce(new Vector2(walkJumpForce / 3 * xForce, walkJumpForce * 2));
+			rigidbody2D.AddForce(new Vector2(stompBounceForce * xForce, walkJumpForce * 2));
 		}
 	}
 
@@ -134,15 +148,21 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void TriggerDeath() {
-		// Trigger death animation. Respawn after a few seconds.
+		// Trigger death animation
 		animator.SetBool("Dead", true);
-		Invoke("Respawn", 4);
 
 		// Ignore user input
 		ignoreInput = true;
 
 		// Set to a layer for enemies to not collide with
 		gameObject.layer = 10; // "EnemyIgnore"
+
+		// Decrement number of current lives
+		gameController.DecrementCurrentLives();
+		if (gameController.GetCurrentLives() >= 0) {
+			// Respawn after a few seconds if we still have remaining lives
+			Invoke("Respawn", 4);
+		}
 	}
 
 	public void Respawn() {
