@@ -44,6 +44,9 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
+		// Starting # of lives
+		currentLives = startingLives;
+
 		ResetGameState();
 	}
 
@@ -55,9 +58,6 @@ public class GameController : MonoBehaviour {
 				Destroy(obj);
 			}
 		}
-
-		// Starting # of lives
-		currentLives = startingLives;
 		
 		// Setup UI
 		UpdateGUI();
@@ -68,25 +68,27 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void StartLevel() {
-		Debug.Log("Starting the level");
+		Debug.Log("Starting the level: " + currentLevel);
 		SetupSpawnPoints();
 
 		leftSpawn.enabled = true;
 		rightSpawn.enabled = true;
 	}
 
-	private	 void SetupSpawnPoints() {
+	private	void SetupSpawnPoints() {
 		Level level = levelConfig.GetLevel(currentLevel);
 
 		// Setup configs on the left spawn
-		leftSpawn.SetSpawnStart(level.leftSpawnStart);
-		leftSpawn.SetSpawnDelay(level.leftSpawnDelay);
-		leftSpawn.SetEnemies(level.leftEnemies);
+		leftSpawn.Setup(level.leftEnemies, level.leftSpawnStart, level.leftSpawnDelay);
 
 		// Setup configs on the right spawn
-		rightSpawn.SetSpawnStart(level.rightSpawnStart);
-		rightSpawn.SetSpawnDelay(level.rightSpawnDelay);
-		rightSpawn.SetEnemies(level.rightEnemies);
+		rightSpawn.Setup(level.rightEnemies, level.rightSpawnStart, level.rightSpawnDelay);
+	}
+
+	private void RestartGame() {
+		currentLevel = 0;
+		currentLives = startingLives;
+		ResetGameState();
 	}
 
 	private void UpdateGUI() {
@@ -101,6 +103,9 @@ public class GameController : MonoBehaviour {
 
 	private void TriggerLevelComplete() {
 		Debug.Log("level complete. start next level.");
+
+		currentLevel++;
+		ResetGameState();
 	}
 
 	public void CheckIfLevelCompleted() {
@@ -132,9 +137,7 @@ public class GameController : MonoBehaviour {
 		UpdateGUI();
 
 		if (currentLives < 0) {
-			Debug.Log("should reset game state");
-			// Restart the game
-			ResetGameState();
+			RestartGame();
 		}
 	}
 	

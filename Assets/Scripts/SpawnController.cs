@@ -21,7 +21,11 @@ public class SpawnController : MonoBehaviour {
 	// Time in seconds before the first spawn.
 	private float spawnStart;
 
-	void Start() {
+	public void Setup(GameObject[] enemies, float start, float delay) {
+		initialEnemies = enemies;
+		spawnStart = start;
+		spawnDelay = delay;
+
 		pendingEnemies = new GameObject[initialEnemies.Length];
 		for (int i = 0; i < initialEnemies.Length; i++) {
 			GameObject enemy = (GameObject)Instantiate(initialEnemies[i]);
@@ -29,6 +33,10 @@ public class SpawnController : MonoBehaviour {
 			pendingEnemies[i] = enemy;
 		}
 
+		// First, cancel any previously invoked Spawn() calls
+		CancelInvoke();
+
+		// Then repeat Spawns at set intervals
 		InvokeRepeating("Spawn", spawnStart, spawnDelay);
 	}
 
@@ -46,7 +54,9 @@ public class SpawnController : MonoBehaviour {
 			// Recreate array sans the first element
 			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length - 1];
 			if (pendingEnemies.Length > 1) {
-				pendingEnemies.CopyTo(remainingEnemies, 1);
+				for (int i = 1; i < pendingEnemies.Length; i++) {
+					remainingEnemies[i - 1] = pendingEnemies[i];
+				}
 			}
 
 			pendingEnemies = remainingEnemies;
@@ -68,17 +78,5 @@ public class SpawnController : MonoBehaviour {
 
 	public int GetNumPendingEnemies() {
 		return pendingEnemies.Length;
-	}
-
-	public void SetSpawnDelay(float spawnDelay) {
-		this.spawnDelay = spawnDelay;
-	}
-
-	public void SetSpawnStart(float spawnStart) {
-		this.spawnStart = spawnStart;
-	}
-
-	public void SetEnemies(GameObject[] enemies) {
-		this.initialEnemies = enemies;
 	}
 }
