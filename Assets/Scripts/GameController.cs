@@ -99,6 +99,30 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
+	private void TriggerLevelComplete() {
+		Debug.Log("level complete. start next level.");
+	}
+
+	public void CheckIfLevelCompleted() {
+		// Checking if any pending enemies to be spawned
+		if (leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
+			return;
+		}
+		
+		// Check if any living enemies still on the scene
+		GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+		foreach(GameObject obj in objects) {
+			if (obj.layer == 9) { // "Enemy" layer
+				EnemyController enemyController = obj.GetComponent<EnemyController>();
+				if (enemyController.GetCurrentState() == EnemyController.EnemyState.NORMAL) {
+					return;
+				}
+			}
+		}
+		
+		TriggerLevelComplete();
+	}
+
 	public int GetCurrentLives() {
 		return currentLives;
 	}
@@ -113,4 +137,5 @@ public class GameController : MonoBehaviour {
 			ResetGameState();
 		}
 	}
+	
 }

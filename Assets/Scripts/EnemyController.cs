@@ -17,6 +17,10 @@ public class EnemyController : MonoBehaviour {
 	public float disabledImmuneTime = 1f;
 	#endregion
 
+	#region References to other game objects
+	private GameController gameController;
+	#endregion
+
 	#region Private
 	// Handle to the Animation
 	private Animator animator;
@@ -28,7 +32,7 @@ public class EnemyController : MonoBehaviour {
 	private float disabledTimer;
 	private float disabledImmuneTimer;
 
-	private enum EnemyState {
+	public enum EnemyState {
 		NORMAL,
 		DISABLED,
 		DISABLED_IMMUNE,
@@ -38,6 +42,10 @@ public class EnemyController : MonoBehaviour {
 	private EnemyState currState = EnemyState.NORMAL;
 	private EnemyState nextState = EnemyState.NORMAL;
 	#endregion
+
+	void Awake() {
+		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+	}
 
 	void Start() {
 		Transform renderObject = transform.Find("renderObject");
@@ -92,6 +100,10 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
+	public EnemyState GetCurrentState() {
+		return currState;
+	}
+
 	public void SetDirection(bool dir) {
 		this.directionToRight = dir;
 	}
@@ -128,5 +140,7 @@ public class EnemyController : MonoBehaviour {
 
 	void Destroy() {
 		Destroy(this.gameObject);
+
+		gameController.CheckIfLevelCompleted();
 	}
 }
