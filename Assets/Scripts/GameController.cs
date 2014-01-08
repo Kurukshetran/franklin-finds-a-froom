@@ -12,8 +12,11 @@ public class GameController : MonoBehaviour {
 	// UI Text displaying remaining lives
 	public GameObject uiLives;
 
-	// UI Text display current level
+	// UI Text displaying current level
 	public GameObject uiLevel;
+
+	// UI Text displaying score
+	public GameObject uiScore;
 	#endregion
 
 	#region Private
@@ -21,6 +24,8 @@ public class GameController : MonoBehaviour {
 	private int currentLives;
 
 	private int currentLevel = 0;
+
+	private int score;
 
 	private LevelConfig levelConfig;
 	private SpawnController leftSpawn;
@@ -46,6 +51,9 @@ public class GameController : MonoBehaviour {
 
 		// Starting # of lives
 		currentLives = startingLives;
+
+		// Starting score
+		score = 0;
 
 		ResetGameState();
 	}
@@ -79,15 +87,16 @@ public class GameController : MonoBehaviour {
 		Level level = levelConfig.GetLevel(currentLevel);
 
 		// Setup configs on the left spawn
-		leftSpawn.Setup(level.leftEnemies, level.leftSpawnStart, level.leftSpawnDelay);
+		leftSpawn.Setup(level.leftEnemies, level.leftSpawnStart, level.leftSpawnDelay, level.endlessMode);
 
 		// Setup configs on the right spawn
-		rightSpawn.Setup(level.rightEnemies, level.rightSpawnStart, level.rightSpawnDelay);
+		rightSpawn.Setup(level.rightEnemies, level.rightSpawnStart, level.rightSpawnDelay, level.endlessMode);
 	}
 
 	private void RestartGame() {
 		currentLevel = 0;
 		currentLives = startingLives;
+		score = 0;
 		ResetGameState();
 	}
 
@@ -99,6 +108,10 @@ public class GameController : MonoBehaviour {
 		if (uiLevel && uiLevel.guiText) {
 			uiLevel.guiText.text = "Level: " + currentLevel;
 		}
+
+		if (uiScore && uiScore.guiText) {
+			uiScore.guiText.text = "Score: " + score;
+		}
 	}
 
 	private void TriggerLevelComplete() {
@@ -109,8 +122,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	public void CheckIfLevelCompleted() {
-		// Checking if any pending enemies to be spawned
-		if (leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
+		// Checking if any pending enemies to be spawned or if this is an endless mode level
+		Level level = levelConfig.GetLevel(currentLevel);
+		if (level.endlessMode || leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
 			return;
 		}
 		
@@ -139,6 +153,11 @@ public class GameController : MonoBehaviour {
 		if (currentLives < 0) {
 			RestartGame();
 		}
+	}
+
+	public void AddToScore(int addPoints) {
+		score += addPoints;
+		UpdateGUI();
 	}
 	
 }

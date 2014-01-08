@@ -34,9 +34,11 @@ public class DummyEnemy2Controller : EnemyController {
 						nextState = EnemyState.DOUBLE_SPEED;
 
 						this.speed = speedIncreased;
+						gameController.AddToScore(25);
 					}
 					else {
 						SetDisabled();
+						gameController.AddToScore(50);
 					}
 
 					pc.OnEnemyStomp();
@@ -51,6 +53,8 @@ public class DummyEnemy2Controller : EnemyController {
 				speed = 0;
 				currState = EnemyState.DEAD;
 				nextState = EnemyState.DEAD;
+
+				gameController.AddToScore(100);
 				
 				Invoke("Destroy", 2);
 			}

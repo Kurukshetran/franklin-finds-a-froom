@@ -23,4 +23,5 @@ public class Level {
 	public float leftSpawnDelay;
 	public float rightSpawnStart;
 	public float rightSpawnDelay;
+	public bool endlessMode;
 }

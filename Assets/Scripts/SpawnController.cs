@@ -21,10 +21,15 @@ public class SpawnController : MonoBehaviour {
 	// Time in seconds before the first spawn.
 	private float spawnStart;
 
-	public void Setup(GameObject[] enemies, float start, float delay) {
+	private bool endlessMode;
+	private int endlessSpawnIndex;
+
+	public void Setup(GameObject[] enemies, float start, float delay, bool endless) {
 		initialEnemies = enemies;
 		spawnStart = start;
 		spawnDelay = delay;
+		endlessMode = endless;
+		endlessSpawnIndex = -1;
 
 		pendingEnemies = new GameObject[initialEnemies.Length];
 		for (int i = 0; i < initialEnemies.Length; i++) {
@@ -41,7 +46,22 @@ public class SpawnController : MonoBehaviour {
 	}
 
 	private void Spawn() {
-		if (pendingEnemies.Length > 0) {
+		if (endlessMode) {
+			if (endlessSpawnIndex < initialEnemies.Length - 1) {
+				endlessSpawnIndex++;
+			}
+			else {
+				endlessSpawnIndex = 0;
+			}
+
+			GameObject enemy = (GameObject)Instantiate(initialEnemies[endlessSpawnIndex]);
+				enemy.transform.position = transform.position;
+			enemy.transform.rotation = transform.rotation;
+			
+			EnemyController enemyController = enemy.GetComponent<EnemyController>();
+			enemyController.SetDirection(directionToRight);
+		}
+		else if (pendingEnemies.Length > 0) {
 			// Instantiate enemy at front of array
 			GameObject enemy = pendingEnemies[0];
 			enemy.SetActive(true);
@@ -64,19 +84,27 @@ public class SpawnController : MonoBehaviour {
 	}
 
 	public void AddEnemyToQueue(GameObject enemy) {
-		GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length + 1];
-
-		if (pendingEnemies.Length > 0) {
-			pendingEnemies.CopyTo(remainingEnemies, 0);
+		if (endlessMode) {
+			Destroy(enemy);
 		}
+		else {
+			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length + 1];
 
-		enemy.SetActive(false);
-		remainingEnemies[remainingEnemies.Length - 1] = enemy;
+			if (pendingEnemies.Length > 0) {
+				pendingEnemies.CopyTo(remainingEnemies, 0);
+			}
 
-		pendingEnemies = remainingEnemies;
+			enemy.SetActive(false);
+			remainingEnemies[remainingEnemies.Length - 1] = enemy;
+
+			pendingEnemies = remainingEnemies;
+		}
 	}
 
 	public int GetNumPendingEnemies() {
-		return pendingEnemies.Length;
+		if (pendingEnemies != null)
+			return pendingEnemies.Length;
+		else
+			return -1;
 	}
 }

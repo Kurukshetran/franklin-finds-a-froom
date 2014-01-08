@@ -18,7 +18,7 @@ public class EnemyController : MonoBehaviour {
 	#endregion
 
 	#region References to other game objects
-	private GameController gameController;
+	protected GameController gameController;
 	#endregion
 
 	#region Private
@@ -123,6 +123,7 @@ public class EnemyController : MonoBehaviour {
 					SetDisabled();
 
 					pc.OnEnemyStomp();
+					gameController.AddToScore(50);
 				}
 				else {
 					pc.TriggerDeath();
@@ -134,6 +135,8 @@ public class EnemyController : MonoBehaviour {
 				speed = 0;
 				currState = EnemyState.DEAD;
 				nextState = EnemyState.DEAD;
+
+				gameController.AddToScore(100);
 
 				Invoke("Destroy", 2);
 			}
