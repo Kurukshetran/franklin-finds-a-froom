@@ -36,14 +36,15 @@ public class EnemyController : MonoBehaviour {
 		NORMAL,
 		DISABLED,
 		DISABLED_IMMUNE,
+		DOUBLE_SPEED,
 		DEAD
 	};
-
-	private EnemyState currState = EnemyState.NORMAL;
-	private EnemyState nextState = EnemyState.NORMAL;
+	
+	protected EnemyState currState = EnemyState.NORMAL;
+	protected EnemyState nextState = EnemyState.NORMAL;
 	#endregion
 
-	void Awake() {
+	protected virtual void Awake() {
 		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 	}
 
@@ -52,7 +53,7 @@ public class EnemyController : MonoBehaviour {
 		animator = renderObject.GetComponent<Animator>();
 	}
 
-	void Update() {
+	protected virtual void Update() {
 		if (currState == EnemyState.DISABLED_IMMUNE) {
 			disabledImmuneTimer -= Time.deltaTime;
 
@@ -75,7 +76,7 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	void FixedUpdate() {
+	protected virtual void FixedUpdate() {
 		int dir = this.directionToRight ? 1 : -1;
 		float mag = speed;
 		if (currState == EnemyState.DISABLED || currState == EnemyState.DISABLED_IMMUNE)
@@ -100,8 +101,8 @@ public class EnemyController : MonoBehaviour {
 		}
 	}
 
-	public EnemyState GetCurrentState() {
-		return currState;
+	public EnemyState CurrState {
+		get { return currState; }
 	}
 
 	public void SetDirection(bool dir) {
@@ -112,7 +113,8 @@ public class EnemyController : MonoBehaviour {
 		nextState = EnemyState.DISABLED_IMMUNE;
 	}
 
-	void OnCollisionEnter2D(Collision2D coll) {
+	protected virtual void OnCollisionEnter2D(Collision2D coll) {
+		Debug.Log("EnemyController.OnCollisionEnter2D");
 		if (coll.gameObject.tag == "Player") {
 		    if (currState == EnemyState.NORMAL) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
