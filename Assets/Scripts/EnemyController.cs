@@ -114,7 +114,6 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	protected virtual void OnCollisionEnter2D(Collision2D coll) {
-		Debug.Log("EnemyController.OnCollisionEnter2D");
 		if (coll.gameObject.tag == "Player") {
 		    if (currState == EnemyState.NORMAL) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
