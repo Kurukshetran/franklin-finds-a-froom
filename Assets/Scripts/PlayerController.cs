@@ -5,25 +5,28 @@ public class PlayerController : MonoBehaviour {
 
 	#region Public
 	// Player's walk speed
-	public float walkSpeed;
+	public float walkSpeed = 6f;
 
 	// Player's run speed
-	public float runSpeed;
+	public float runSpeed = 9f;
 
 	// Force the player jumps with while walking
-	public float walkJumpForce;
+	public float walkJumpForce = 800f;
 
 	// Force the player jumps with while running
-	public float runJumpForce;
+	public float runJumpForce = 1050f;
 
 	// Force applied to player after stomping on enemy
-	public float stompBounceForce;
+	public float stompBounceForce = 150f;
 
 	// Normal gravity scale of player falling to the ground
-	public float gravityScaleNormal;
+	public float gravityScaleNormal = 10f;
 
 	// Gravity scale when player is floating to the ground
-	public float gravityScaleFloating;
+	public float gravityScaleFloating = 2f;
+
+	// Max amount of time the float effect can be applied to a jump
+	public float jumpFloatTime = 0.39f;
 
 	// Time to delay respawn on death
 	public int respawnDelay = 4;
@@ -42,6 +45,8 @@ public class PlayerController : MonoBehaviour {
 	private Animator animator;
 
 	private Transform groundCheck;
+
+	private float jumpFloatTimer;
 
 	private bool doJump;
 
@@ -101,8 +106,9 @@ public class PlayerController : MonoBehaviour {
 			doJump = true;
 		}
 
+		jumpFloatTimer -= Time.deltaTime;
 		// Adjust gravity scale based on the jump button
-		if (Input.GetButton("Jump")) {
+		if (Input.GetButton("Jump") && jumpFloatTimer > 0) {
 			rigidbody2D.gravityScale = gravityScaleFloating;
 		}
 		else {
@@ -113,6 +119,7 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate() {
 		if (doJump) {
 			doJump = false;
+			jumpFloatTimer = jumpFloatTime;
 
 			// Using animator speed to determine whether or not character is running
 			float jumpForce;

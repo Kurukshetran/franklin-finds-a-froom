@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour {
 	public float disabledTime = 5f;
 
 	// Time the enemy is immune from player collision at beginning of the disabled state
-	public float disabledImmuneTime = 1f;
+	public float disabledImmuneTime = 0.75f;
 	#endregion
 
 	#region References to other game objects
