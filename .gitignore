@@ -1,9 +1,12 @@
+*.asset
 *.csproj
 *.dwlt
 *.meta
 *.sln
 *.userprefs
+Builds
 Library/assetDatabase3
+Library/AssetImportState
 Library/guidmapper
 Library/expandedItems
 Library/InspectorExpandedItems.asset
