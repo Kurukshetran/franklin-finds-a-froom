@@ -44,7 +44,9 @@ public class PlayerController : MonoBehaviour {
 	// Player's Animator component
 	private Animator animator;
 
-	private Transform groundCheck;
+	private Transform groundCheckLeft;
+
+	private Transform groundCheckRight;
 
 	private float jumpFloatTimer;
 
@@ -62,7 +64,8 @@ public class PlayerController : MonoBehaviour {
 
 		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
-		groundCheck = transform.Find("groundCheck");
+		groundCheckLeft = transform.Find("groundCheck_left");
+		groundCheckRight = transform.Find("groundCheck_right");
 	}
 
 	void Update() {
@@ -98,7 +101,8 @@ public class PlayerController : MonoBehaviour {
 
 		// Check if player can jump, and mark it to jump at the next iteration of FixedUpdate()
 		bool isOnGround = false;
-		if (Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"))) {
+		if (Physics2D.Linecast(transform.position, groundCheckLeft.position, 1 << LayerMask.NameToLayer("Ground"))
+		    || Physics2D.Linecast(transform.position, groundCheckRight.position, 1 << LayerMask.NameToLayer("Ground"))) {
 			isOnGround = true;
 		}
 
