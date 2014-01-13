@@ -5,11 +5,13 @@ public class GroundTile : MonoBehaviour {
 
 	private Transform tileRenderer;
 
-	private Transform enemyCheck;
+	private Transform enemyCheckLeft;
+	private Transform enemyCheckRight;
 
 	void Awake() {
 		tileRenderer = transform.FindChild("tileRenderer");
-		enemyCheck = transform.FindChild("enemyCheck");
+		enemyCheckLeft = transform.FindChild("enemyCheck_left");
+		enemyCheckRight = transform.FindChild("enemyCheck_right");
 	}
 	
 	void OnCollisionEnter2D(Collision2D coll) {
@@ -22,8 +24,11 @@ public class GroundTile : MonoBehaviour {
 			}
 
 			// If an enemy is above the tile, flip over the enemy
-			if (enemyCheck) {
-				RaycastHit2D hit = Physics2D.Linecast(transform.position, enemyCheck.position, 1 << LayerMask.NameToLayer("Enemy"));
+			if (enemyCheckLeft && enemyCheckRight) {
+				RaycastHit2D hitLeft = Physics2D.Linecast(transform.position, enemyCheckLeft.position, 1 << LayerMask.NameToLayer("Enemy"));
+				RaycastHit2D hitRight = Physics2D.Linecast(transform.position, enemyCheckRight.position, 1 << LayerMask.NameToLayer("Enemy"));
+				RaycastHit2D hit = hitLeft ? hitLeft : hitRight;
+
 				if (hit && hit.transform) {
 					EnemyController enemyController = hit.transform.GetComponent<EnemyController>();
 					enemyController.SetDisabled();
