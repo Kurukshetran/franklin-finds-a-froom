@@ -31,7 +31,7 @@ public class GroundTile : MonoBehaviour {
 
 				if (hit && hit.transform) {
 					EnemyController enemyController = hit.transform.GetComponent<EnemyController>();
-					enemyController.SetDisabled();
+					enemyController.OnBottomBump();
 				}
 			}
 		}

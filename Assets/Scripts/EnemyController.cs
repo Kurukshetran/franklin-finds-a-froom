@@ -25,6 +25,12 @@ public class EnemyController : MonoBehaviour {
 	// Handle to the Animation
 	private Animator animator;
 
+	// Reference to particle system played when player stomps on enemy
+	private ParticleSystem particleSysStomp;
+
+	// Reference to particle system player when enemy is bumped from below
+	private ParticleSystem particleSysBump;
+
 	// If true, enemy movement is to the right.
 	private bool directionToRight = true;
 
@@ -46,6 +52,8 @@ public class EnemyController : MonoBehaviour {
 
 	protected virtual void Awake() {
 		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+		particleSysStomp = transform.FindChild("particleSystem_stomp").GetComponent<ParticleSystem>();
+		particleSysBump = transform.FindChild("particleSystem_bump").GetComponent<ParticleSystem>();
 	}
 
 	void Start() {
@@ -109,8 +117,18 @@ public class EnemyController : MonoBehaviour {
 		this.directionToRight = dir;
 	}
 
-	public void SetDisabled() {
+	protected void SetDisabled() {
 		nextState = EnemyState.DISABLED_IMMUNE;
+	}
+
+	public void OnBottomBump() {
+		SetDisabled();
+		particleSysBump.Play();
+	}
+
+	public void OnStomped() {
+		SetDisabled();
+		particleSysStomp.Play();
 	}
 
 	protected virtual void OnCollisionEnter2D(Collision2D coll) {
@@ -119,7 +137,7 @@ public class EnemyController : MonoBehaviour {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 
 				if (coll.contacts[0].normal.y == -1 && coll.relativeVelocity.y > 0) {
-					SetDisabled();
+					OnStomped();
 
 					pc.OnEnemyStomp();
 					gameController.AddToScore(50);
