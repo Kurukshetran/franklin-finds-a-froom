@@ -35,6 +35,9 @@ public class PlayerController : MonoBehaviour {
 	#region References to other GameObjects
 	// Location to respawn at
 	public GameObject respawnLocation;
+
+	// Particle system to play on player jump
+	public GameObject particleSysStompObject;
 	#endregion
 
 	#region Private
@@ -47,6 +50,8 @@ public class PlayerController : MonoBehaviour {
 	private Transform groundCheckLeft;
 
 	private Transform groundCheckRight;
+
+	private ParticleSystem particleSysStomp;
 
 	private float jumpFloatTimer;
 
@@ -66,6 +71,7 @@ public class PlayerController : MonoBehaviour {
 
 		groundCheckLeft = transform.Find("groundCheck_left");
 		groundCheckRight = transform.Find("groundCheck_right");
+		particleSysStomp = particleSysStompObject.GetComponent<ParticleSystem>();
 	}
 
 	void Update() {
@@ -151,6 +157,13 @@ public class PlayerController : MonoBehaviour {
 			}
 
 			rigidbody2D.AddForce(new Vector2(stompBounceForce * xForce, walkJumpForce * 2));
+
+			// Play particle system effect
+			if (particleSysStompObject != null && particleSysStomp != null) {
+				// Move into position of the player, but down 1 unit and towards the camera along the z-axis by 1 unit
+				particleSysStompObject.transform.position = new Vector3(transform.position.x, transform.position.y - 1f, -1);
+				particleSysStomp.Play();
+			}
 		}
 	}
 
