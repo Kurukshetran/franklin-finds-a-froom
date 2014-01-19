@@ -106,6 +106,15 @@ public class PlayerController : MonoBehaviour {
 			isOnGround = true;
 		}
 
+		// Notify animator to show jump animation
+		if (isOnGround) {
+			animator.SetBool("Jump", false);
+		}
+		else {
+			animator.SetBool("Jump", true);
+		}
+
+		// Flag a jump to occur on the next FixedUpdate
 		if (isOnGround && Input.GetButtonDown("Jump")) {
 			doJump = true;
 		}
