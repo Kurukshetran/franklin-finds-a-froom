@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour {
 		transform.position = new Vector3(newX, transform.position.y, transform.position.z);
 
 		// If the player's forward vector is in the opposite direction of the movement, rotate the character 180 degrees
-		if ((hMovement > 0f && transform.right.x == -1) || (hMovement < 0f && transform.right.x == 1)) {
+		if ((hMovement > 0f && transform.right.x < 0) || (hMovement < 0f && transform.right.x > 0)) {
 			transform.Rotate(Vector3.up, 180f);
 		}
 
