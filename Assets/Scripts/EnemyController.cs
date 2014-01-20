@@ -136,7 +136,8 @@ public class EnemyController : MonoBehaviour {
 		    if (currState == EnemyState.NORMAL) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 
-				if (coll.contacts[0].normal.y == -1 && coll.relativeVelocity.y > 0) {
+				// Using position of the stomp particle system to check if collision with player came from above or not
+				if (particleSysStomp.transform.position.y < coll.gameObject.transform.position.y) {
 					OnStomped();
 
 					pc.OnEnemyStomp();
