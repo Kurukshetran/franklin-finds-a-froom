@@ -168,6 +168,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void TriggerDeath() {
+		Debug.Log("PC trigger death");
 		// Trigger death animation
 		animator.SetBool("Dead", true);
 

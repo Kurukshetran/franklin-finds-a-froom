@@ -21,12 +21,12 @@ public class EnemyController : MonoBehaviour {
 	protected GameController gameController;
 	#endregion
 
-	#region Private
+	#region Internal vars
 	// Handle to the Animation
-	private Animator animator;
+	protected Animator animator;
 
 	// Reference to particle system played when player stomps on enemy
-	private ParticleSystem particleSysStomp;
+	protected ParticleSystem particleSysStomp;
 
 	// Reference to particle system player when enemy is bumped from below
 	private ParticleSystem particleSysBump;
@@ -77,9 +77,7 @@ public class EnemyController : MonoBehaviour {
 			disabledTimer -= Time.deltaTime;
 
 			if (disabledTimer <= 0) {
-				animator.SetBool("Disabled", false);
-				currState = EnemyState.NORMAL;
-				nextState = EnemyState.NORMAL;
+				RecoverFromDisabled();
 			}
 		}
 	}
@@ -113,11 +111,19 @@ public class EnemyController : MonoBehaviour {
 		get { return currState; }
 	}
 
+	protected virtual void RecoverFromDisabled() {
+		animator.SetBool("Disabled", false);
+		currState = EnemyState.NORMAL;
+		nextState = EnemyState.NORMAL;
+	}
+	
+	public virtual void ResetProperties() {}
+
 	public void SetDirection(bool dir) {
 		this.directionToRight = dir;
 	}
 
-	protected void SetDisabled() {
+	protected virtual void SetDisabled() {
 		nextState = EnemyState.DISABLED_IMMUNE;
 	}
 
@@ -144,6 +150,7 @@ public class EnemyController : MonoBehaviour {
 					gameController.AddToScore(50);
 				}
 				else {
+					Debug.Log("PC TRIGGER DEATH FROM BASE");
 					pc.TriggerDeath();
 				}
 			}

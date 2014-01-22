@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DummyEnemy2Controller : EnemyController {
-	
+public class EnemySpeedFroomController : EnemyController {
+
+	// Speed of enemy in its normal state
+	public float speedInitial;
+	// Speed of enemy in its increased-speed state
 	public float speedIncreased;
 
 	private bool isPlayerColliding;
@@ -26,24 +29,30 @@ public class DummyEnemy2Controller : EnemyController {
 			isPlayerColliding = true;
 			Invoke("ResetPlayerColliding", 0.1f);
 
+			Debug.Log("state: "+currState+", nextState: "+nextState);
+
 			if (currState == EnemyState.NORMAL || currState == EnemyState.DOUBLE_SPEED) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 				
-				if (coll.contacts[0].normal.y == -1 && coll.relativeVelocity.y > 0) {
+				// Using position of the stomp particle system to check if collision with player came from above or not
+				if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y) {
+					Debug.Log("  stomp");
 					if (currState == EnemyState.NORMAL) {
 						nextState = EnemyState.DOUBLE_SPEED;
 
+						// On initial stomp, increase speed movement and change animation
 						this.speed = speedIncreased;
-						gameController.AddToScore(25);
+						base.animator.SetBool("Angry", true);
 					}
 					else {
+						// On second stomp, place in the disabled state
 						SetDisabled();
-						gameController.AddToScore(50);
 					}
 
 					pc.OnEnemyStomp();
 				}
 				else {
+					Debug.Log("PC TRIGGER DEATH");
 					pc.TriggerDeath();
 				}
 			}
@@ -66,6 +75,29 @@ public class DummyEnemy2Controller : EnemyController {
 		if (coll.gameObject.tag == "Player" && isPlayerColliding) {
 			isPlayerColliding = false;
 		}
+	}
+
+	protected override void RecoverFromDisabled() {
+		base.RecoverFromDisabled();
+
+		currState = EnemyState.DOUBLE_SPEED;
+		nextState = EnemyState.DOUBLE_SPEED;
+	}
+
+	public override void ResetProperties() {
+		currState = EnemyState.NORMAL;
+		nextState = EnemyState.NORMAL;
+		speed = speedInitial;
+
+		if (base.animator)
+			base.animator.SetBool("Angry", false);
+	}
+
+	protected override void SetDisabled() {
+		base.SetDisabled();
+
+		// Increase speed
+		speed = speedIncreased;
 	}
 
 	private void ResetPlayerColliding() {

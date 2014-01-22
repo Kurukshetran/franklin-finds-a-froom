@@ -70,6 +70,7 @@ public class SpawnController : MonoBehaviour {
 
 			EnemyController enemyController = enemy.GetComponent<EnemyController>();
 			enemyController.SetDirection(directionToRight);
+			enemyController.ResetProperties();
 
 			// Recreate array sans the first element
 			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length - 1];
