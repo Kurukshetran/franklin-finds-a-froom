@@ -29,7 +29,7 @@ public class EnemyController : MonoBehaviour {
 	protected ParticleSystem particleSysStomp;
 
 	// Reference to particle system player when enemy is bumped from below
-	private ParticleSystem particleSysBump;
+	protected ParticleSystem particleSysBump;
 
 	// If true, enemy movement is to the right.
 	private bool directionToRight = true;
@@ -43,6 +43,7 @@ public class EnemyController : MonoBehaviour {
 		DISABLED,
 		DISABLED_IMMUNE,
 		DOUBLE_SPEED,
+		TRANSITION_TO_DOUBLE,
 		DEAD
 	};
 	
@@ -85,7 +86,7 @@ public class EnemyController : MonoBehaviour {
 	protected virtual void FixedUpdate() {
 		int dir = this.directionToRight ? 1 : -1;
 		float mag = speed;
-		if (currState == EnemyState.DISABLED || currState == EnemyState.DISABLED_IMMUNE)
+		if (currState == EnemyState.DISABLED || currState == EnemyState.DISABLED_IMMUNE || currState == EnemyState.TRANSITION_TO_DOUBLE)
 			mag = 0;
 
 		float velocity = mag * dir;
@@ -127,7 +128,7 @@ public class EnemyController : MonoBehaviour {
 		nextState = EnemyState.DISABLED_IMMUNE;
 	}
 
-	public void OnBottomBump() {
+	public virtual void OnBottomBump() {
 		SetDisabled();
 		particleSysBump.Play();
 	}
@@ -150,7 +151,6 @@ public class EnemyController : MonoBehaviour {
 					gameController.AddToScore(50);
 				}
 				else {
-					Debug.Log("PC TRIGGER DEATH FROM BASE");
 					pc.TriggerDeath();
 				}
 			}

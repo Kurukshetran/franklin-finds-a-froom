@@ -8,6 +8,12 @@ public class EnemySpeedFroomController : EnemyController {
 	// Speed of enemy in its increased-speed state
 	public float speedIncreased;
 
+	// Time to transition from normal to double speed. This should probably match up with the animation transition.
+	public float timeTransitionToDouble = 0.5f;
+
+	// Internal timer used to track how long to stay in the transition state
+	private float transitionTimer;
+
 	private bool isPlayerColliding;
 
 	protected override void Awake() {
@@ -16,10 +22,21 @@ public class EnemySpeedFroomController : EnemyController {
 		isPlayerColliding = false;
 	}
 
+	protected override void Update() {
+		base.Update();
+
+		if (currState == EnemyState.TRANSITION_TO_DOUBLE) {
+			transitionTimer -= Time.deltaTime;
+
+			if (transitionTimer <= 0) {
+				currState = EnemyState.DOUBLE_SPEED;
+				nextState = EnemyState.DOUBLE_SPEED;
+			}
+		}
+	}
+
 	protected override void FixedUpdate() {
 		base.FixedUpdate();
-
-		currState = nextState;
 	}
 
 	protected override void OnCollisionEnter2D(Collision2D coll) {
@@ -29,20 +46,14 @@ public class EnemySpeedFroomController : EnemyController {
 			isPlayerColliding = true;
 			Invoke("ResetPlayerColliding", 0.1f);
 
-			Debug.Log("state: "+currState+", nextState: "+nextState);
-
 			if (currState == EnemyState.NORMAL || currState == EnemyState.DOUBLE_SPEED) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 				
 				// Using position of the stomp particle system to check if collision with player came from above or not
 				if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y) {
-					Debug.Log("  stomp");
 					if (currState == EnemyState.NORMAL) {
-						nextState = EnemyState.DOUBLE_SPEED;
-
-						// On initial stomp, increase speed movement and change animation
-						this.speed = speedIncreased;
-						base.animator.SetBool("Angry", true);
+						// On initial stomp, change to angry state to increase speed movement
+						ChangeStateToAngry(true);
 					}
 					else {
 						// On second stomp, place in the disabled state
@@ -52,7 +63,6 @@ public class EnemySpeedFroomController : EnemyController {
 					pc.OnEnemyStomp();
 				}
 				else {
-					Debug.Log("PC TRIGGER DEATH");
 					pc.TriggerDeath();
 				}
 			}
@@ -70,6 +80,20 @@ public class EnemySpeedFroomController : EnemyController {
 		}
 	}
 
+	/**
+	 * Triggered when enemy is bumped by ground from below.
+	 */
+	public override void OnBottomBump() {
+		if (currState == EnemyState.DOUBLE_SPEED) {
+			SetDisabled();
+		}
+		else if (currState == EnemyState.NORMAL) {
+			ChangeStateToAngry(true);
+		}
+
+		base.particleSysBump.Play();
+	}
+
 	protected void OnCollisionExit2D(Collision2D coll) {
 		// The Player collision exit somehow never gets triggered...
 		if (coll.gameObject.tag == "Player" && isPlayerColliding) {
@@ -80,17 +104,11 @@ public class EnemySpeedFroomController : EnemyController {
 	protected override void RecoverFromDisabled() {
 		base.RecoverFromDisabled();
 
-		currState = EnemyState.DOUBLE_SPEED;
-		nextState = EnemyState.DOUBLE_SPEED;
+		ChangeStateToAngry(true);
 	}
 
 	public override void ResetProperties() {
-		currState = EnemyState.NORMAL;
-		nextState = EnemyState.NORMAL;
-		speed = speedInitial;
-
-		if (base.animator)
-			base.animator.SetBool("Angry", false);
+		ChangeStateToAngry(false);
 	}
 
 	protected override void SetDisabled() {
@@ -98,6 +116,28 @@ public class EnemySpeedFroomController : EnemyController {
 
 		// Increase speed
 		speed = speedIncreased;
+	}
+
+	private void ChangeStateToAngry(bool beAngry) {
+		if (beAngry) {
+			transitionTimer = timeTransitionToDouble;
+
+			currState = EnemyState.TRANSITION_TO_DOUBLE;
+			nextState = EnemyState.TRANSITION_TO_DOUBLE;
+
+			speed = speedIncreased;
+			if (base.animator)
+				base.animator.SetBool("Angry", true);
+		}
+		else {
+			currState = EnemyState.NORMAL;
+			nextState = EnemyState.NORMAL;
+
+			speed = speedInitial;
+
+			if (base.animator)
+				base.animator.SetBool("Angry", false);
+		}
 	}
 
 	private void ResetPlayerColliding() {
