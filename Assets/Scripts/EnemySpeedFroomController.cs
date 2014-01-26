@@ -60,7 +60,11 @@ public class EnemySpeedFroomController : EnemyController {
 						SetDisabled();
 					}
 
+					// Player behavior when it stomps on enemy
 					pc.OnEnemyStomp();
+
+					// Player the stomp particle system any time there's a stomp
+					base.particleSysStomp.Play();
 				}
 				else {
 					pc.TriggerDeath();

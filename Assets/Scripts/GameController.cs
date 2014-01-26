@@ -133,7 +133,7 @@ public class GameController : MonoBehaviour {
 		foreach(GameObject obj in objects) {
 			if (obj.layer == 9) { // "Enemy" layer
 				EnemyController enemyController = obj.GetComponent<EnemyController>();
-				if (enemyController.CurrState == EnemyController.EnemyState.NORMAL) {
+				if (enemyController.CurrState != EnemyController.EnemyState.DEAD) {
 					return;
 				}
 			}
