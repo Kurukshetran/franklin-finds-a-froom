@@ -32,11 +32,11 @@ public class EnemyController : MonoBehaviour {
 	protected ParticleSystem particleSysBump;
 
 	// If true, enemy movement is to the right.
-	private bool directionToRight = true;
+	protected bool directionToRight = true;
 
 	// Timers for managing disabled states.
-	private float disabledTimer;
-	private float disabledImmuneTimer;
+	protected float disabledTimer;
+	protected float disabledImmuneTimer;
 
 	public enum EnemyState {
 		NORMAL,
@@ -57,7 +57,7 @@ public class EnemyController : MonoBehaviour {
 		particleSysBump = transform.FindChild("particleSystem_bump").GetComponent<ParticleSystem>();
 	}
 
-	void Start() {
+	protected virtual void Start() {
 		Transform renderObject = transform.Find("renderObject");
 		animator = renderObject.GetComponent<Animator>();
 	}
