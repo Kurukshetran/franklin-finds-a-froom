@@ -50,7 +50,9 @@ public class EnemySpeedFroomController : EnemyController {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 				
 				// Using position of the stomp particle system to check if collision with player came from above or not
-				if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y) {
+				// Also, if enemy is wearing the helmet, then trigger player death.
+				if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y
+				    && !hasHelmet) {
 					if (currState == EnemyState.NORMAL) {
 						// On initial stomp, change to angry state to increase speed movement
 						ChangeStateToAngry(true);

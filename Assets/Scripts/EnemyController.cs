@@ -15,6 +15,12 @@ public class EnemyController : MonoBehaviour {
 
 	// Time the enemy is immune from player collision at beginning of the disabled state
 	public float disabledImmuneTime = 0.75f;
+
+	// Has the helmet equipped. Prevents stomp attacks.
+	public bool hasHelmet = false;
+
+	// Has the boots equipped. Prevents bottom bumps.
+	public bool hasBoots = false;
 	#endregion
 
 	#region References to other game objects
@@ -143,8 +149,9 @@ public class EnemyController : MonoBehaviour {
 		    if (currState == EnemyState.NORMAL) {
 				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 
-				// Using position of the stomp particle system to check if collision with player came from above or not
-				if (particleSysStomp.transform.position.y < coll.gameObject.transform.position.y) {
+				// Using position of the stomp particle system to check if collision with player came from above or not.
+				// Also, if enemy is wearing the helmet, then trigger player death.
+				if (particleSysStomp.transform.position.y < coll.gameObject.transform.position.y && !hasHelmet) {
 					OnStomped();
 
 					pc.OnEnemyStomp();
