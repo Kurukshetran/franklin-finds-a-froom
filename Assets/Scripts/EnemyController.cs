@@ -21,6 +21,9 @@ public class EnemyController : MonoBehaviour {
 
 	// Has the boots equipped. Prevents bottom bumps.
 	public bool hasBoots = false;
+
+	// If hasBoots flag is true, then this is the force applied to the character on bottom bump.
+	public float bumpForceWithBoots = 400f;
 	#endregion
 
 	#region References to other game objects
@@ -135,7 +138,15 @@ public class EnemyController : MonoBehaviour {
 	}
 
 	public virtual void OnBottomBump() {
-		SetDisabled();
+		// If boots are not equipped, then disable the character
+		if (!hasBoots) {
+			SetDisabled();
+		}
+		// Otherwise, just simulate an upward bounce
+		else {
+			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
+		}
+
 		particleSysBump.Play();
 	}
 

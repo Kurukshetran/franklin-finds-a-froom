@@ -90,11 +90,20 @@ public class EnemySpeedFroomController : EnemyController {
 	 * Triggered when enemy is bumped by ground from below.
 	 */
 	public override void OnBottomBump() {
-		if (currState == EnemyState.DOUBLE_SPEED) {
-			SetDisabled();
+		// If boots are not equipped, then disable the character
+		if (!hasBoots) {
+			// On initial bump, change to angry state 
+			if (currState == EnemyState.NORMAL) {
+				ChangeStateToAngry(true);
+			}
+			// On second bump, disable the character
+			else if (currState == EnemyState.DOUBLE_SPEED) {
+				SetDisabled();
+			}
 		}
-		else if (currState == EnemyState.NORMAL) {
-			ChangeStateToAngry(true);
+		// Otherwise, just simulate an upward bounce
+		else {
+			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
 		}
 
 		base.particleSysBump.Play();
