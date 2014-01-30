@@ -33,6 +33,16 @@ public class GroundTile : MonoBehaviour {
 					EnemyController enemyController = hit.transform.GetComponent<EnemyController>();
 					enemyController.OnBottomBump();
 				}
+
+				// Bumping coin picks it up
+				RaycastHit2D hitLeftPickup = Physics2D.Linecast(transform.position, enemyCheckLeft.position, 1 << LayerMask.NameToLayer("Pickup"));
+				RaycastHit2D hitRightPickup = Physics2D.Linecast(transform.position, enemyCheckRight.position, 1 << LayerMask.NameToLayer("Pickup"));
+				RaycastHit2D hitPickup = hitLeftPickup ? hitLeftPickup : hitRightPickup;
+				
+				if (hitPickup && hitPickup.transform) {
+					CoinController coin = hitPickup.transform.GetComponent<CoinController>();
+					coin.Pickup();
+				}
 			}
 		}
 	}

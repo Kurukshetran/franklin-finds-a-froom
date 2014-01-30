@@ -54,23 +54,39 @@ public class SpawnController : MonoBehaviour {
 				endlessSpawnIndex = 0;
 			}
 
-			GameObject enemy = (GameObject)Instantiate(initialEnemies[endlessSpawnIndex]);
-				enemy.transform.position = transform.position;
-			enemy.transform.rotation = transform.rotation;
+			GameObject spawnObj = (GameObject)Instantiate(initialEnemies[endlessSpawnIndex]);
+			spawnObj.transform.position = transform.position;
+			spawnObj.transform.rotation = transform.rotation;
 			
-			EnemyController enemyController = enemy.GetComponent<EnemyController>();
-			enemyController.SetDirection(directionToRight);
+			EnemyController enemyController = spawnObj.GetComponent<EnemyController>();
+			if (enemyController) {
+				enemyController.SetDirection(directionToRight);
+			}
+			else {
+				DirectionController dirController = spawnObj.GetComponent<DirectionController>();
+				if (dirController) {
+					dirController.SetDirection(directionToRight);
+				}
+			}
 		}
 		else if (pendingEnemies.Length > 0) {
 			// Instantiate enemy at front of array
-			GameObject enemy = pendingEnemies[0];
-			enemy.SetActive(true);
-			enemy.transform.position = transform.position;
-			enemy.transform.rotation = transform.rotation;
+			GameObject spawnObj = pendingEnemies[0];
+			spawnObj.SetActive(true);
+			spawnObj.transform.position = transform.position;
+			spawnObj.transform.rotation = transform.rotation;
 
-			EnemyController enemyController = enemy.GetComponent<EnemyController>();
-			enemyController.SetDirection(directionToRight);
-			enemyController.ResetProperties();
+			EnemyController enemyController = spawnObj.GetComponent<EnemyController>();
+			if (enemyController) {
+				enemyController.SetDirection(directionToRight);
+				enemyController.ResetProperties();
+			}
+			else {
+				DirectionController dirController = spawnObj.GetComponent<DirectionController>();
+				if (dirController) {
+					dirController.SetDirection(directionToRight);
+				}
+			}
 
 			// Recreate array sans the first element
 			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length - 1];

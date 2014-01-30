@@ -15,5 +15,10 @@ public class EnemyRespawner : MonoBehaviour {
 		if (other.gameObject.layer == 9) { // "Enemy" layer
 			spawnController.AddEnemyToQueue(other.gameObject);
 		}
+		// "Pickup" layer objects get destroyed
+		else if (other.gameObject.layer == 11) {
+			Destroy(other.gameObject);
+		}
+
 	}
 }
