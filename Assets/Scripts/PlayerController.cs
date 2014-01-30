@@ -16,8 +16,11 @@ public class PlayerController : MonoBehaviour {
 	// Force the player jumps with while running
 	public float runJumpForce = 1050f;
 
-	// Force applied to player after stomping on enemy
-	public float stompBounceForce = 150f;
+	// Force applied in X direction to player after stomping on enemy
+	public float stompBounceForceX = 200f;
+
+	// Force applied in X direction to player after stomping on enemy
+	public float stompBounceForceY = 1000f;
 
 	// Normal gravity scale of player falling to the ground
 	public float gravityScaleNormal = 10f;
@@ -130,8 +133,13 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
+		// Flag to make sure a second upward force is applied later
+		bool didJump = false;
+
 		if (doJump) {
 			doJump = false;
+			didJump = true;
+
 			jumpFloatTimer = jumpFloatTime;
 
 			// Using animator speed to determine whether or not character is running
@@ -148,7 +156,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// Create bounce effect after stomping on an enemy
-		if (doStompBounce) {
+		if (!didJump && doStompBounce) {
 			doStompBounce = false;
 
 			int xForce = 0;
@@ -159,7 +167,7 @@ public class PlayerController : MonoBehaviour {
 				xForce = -1;
 			}
 
-			rigidbody2D.AddForce(new Vector2(stompBounceForce * xForce, walkJumpForce * 2));
+			rigidbody2D.AddForce(new Vector2(stompBounceForceX * xForce, stompBounceForceY));
 		}
 	}
 
