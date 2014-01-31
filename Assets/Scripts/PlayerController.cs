@@ -35,11 +35,6 @@ public class PlayerController : MonoBehaviour {
 	public int respawnDelay = 4;
 	#endregion
 
-	#region References to other GameObjects
-	// Location to respawn at
-	public GameObject respawnLocation;
-	#endregion
-
 	#region Private
 	// Game controller
 	private GameController gameController;
@@ -196,7 +191,9 @@ public class PlayerController : MonoBehaviour {
 
 	public void Respawn() {
 		animator.SetBool("Dead", false);
-		transform.position = respawnLocation.transform.position;
+
+		// Reset the level
+		gameController.ResetGameState();
 
 		// Re-enable input
 		ignoreInput = false;

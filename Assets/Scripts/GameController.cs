@@ -20,6 +20,12 @@ public class GameController : MonoBehaviour {
 
 	// UI Text to to display level on intro
 	public GameObject uiIntroLevel;
+
+	// Reference to the player
+	public GameObject player;
+
+	// The player's starting position
+	public Vector3 playerStartingPosition;
 	#endregion
 
 	#region Private
@@ -61,11 +67,15 @@ public class GameController : MonoBehaviour {
 		ResetGameState();
 	}
 
-	private void ResetGameState() {
-		// Clear any enemies off the scene
+	/**
+	 * Reset the state of the level. Includes clearing the enemies off the screen and resetting the UI.
+	 */
+	public void ResetGameState() {
+		// Clear any enemies or pickups off the scene
 		GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		foreach(GameObject obj in objects) {
-			if (obj.layer == 9) { // "Enemy" layer
+			// 9 = "Enemy" layer. 11 = "Pickup" layer.
+			if (obj.layer == 9 || obj.layer == 11) {
 				Destroy(obj);
 			}
 		}
@@ -76,6 +86,9 @@ public class GameController : MonoBehaviour {
 		// Show intro level UI
 		uiIntroLevel.SetActive(true);
 		uiIntroLevel.guiText.text = "Level " + currentLevel;
+
+		// Move player to beginning state
+		player.transform.position = playerStartingPosition;
 
 		// Start level
 		Debug.Log("Starting the level in 2 seconds");
