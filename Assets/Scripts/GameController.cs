@@ -17,6 +17,9 @@ public class GameController : MonoBehaviour {
 
 	// UI Text displaying score
 	public GameObject uiScore;
+
+	// UI Text to to display level on intro
+	public GameObject uiIntroLevel;
 	#endregion
 
 	#region Private
@@ -70,6 +73,10 @@ public class GameController : MonoBehaviour {
 		// Setup UI
 		UpdateGUI();
 
+		// Show intro level UI
+		uiIntroLevel.SetActive(true);
+		uiIntroLevel.guiText.text = "Level " + currentLevel;
+
 		// Start level
 		Debug.Log("Starting the level in 2 seconds");
 		Invoke("StartLevel", 2);
@@ -81,6 +88,9 @@ public class GameController : MonoBehaviour {
 
 		leftSpawn.enabled = true;
 		rightSpawn.enabled = true;
+
+		// Hide intro level UI
+		uiIntroLevel.SetActive(false);
 	}
 
 	private	void SetupSpawnPoints() {
