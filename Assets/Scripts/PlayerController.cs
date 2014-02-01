@@ -199,7 +199,7 @@ public class PlayerController : MonoBehaviour {
 		ignoreInput = false;
 
 		// Reset layer to allow enemy collisions
-		gameObject.layer = 0; // "Default"
+		gameObject.layer = 13; // "Player"
 
 		// Reset camera position
 		GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");

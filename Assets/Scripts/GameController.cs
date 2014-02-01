@@ -26,6 +26,9 @@ public class GameController : MonoBehaviour {
 
 	// The player's starting position
 	public Vector3 playerStartingPosition;
+
+	// Fire shower spawn object
+	public GameObject fireSpawner;
 	#endregion
 
 	#region Private
@@ -39,6 +42,9 @@ public class GameController : MonoBehaviour {
 	private LevelConfig levelConfig;
 	private SpawnController leftSpawn;
 	private SpawnController rightSpawn;
+
+	// Controller to the fire shower spawner
+	private FireShowerController fireController;
 	#endregion
 
 	void Awake() {
@@ -58,6 +64,9 @@ public class GameController : MonoBehaviour {
 			}
 		}
 
+		// Fire shower controller
+		fireController = fireSpawner.GetComponent<FireShowerController>();
+
 		// Starting # of lives
 		currentLives = startingLives;
 
@@ -71,11 +80,11 @@ public class GameController : MonoBehaviour {
 	 * Reset the state of the level. Includes clearing the enemies off the screen and resetting the UI.
 	 */
 	public void ResetGameState() {
-		// Clear any enemies or pickups off the scene
+		// Clear objects off the scene
 		GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
 		foreach(GameObject obj in objects) {
-			// 9 = "Enemy" layer. 11 = "Pickup" layer.
-			if (obj.layer == 9 || obj.layer == 11) {
+			// 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
+			if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
 				Destroy(obj);
 			}
 		}
@@ -90,6 +99,9 @@ public class GameController : MonoBehaviour {
 		// Move player to beginning state
 		player.transform.position = playerStartingPosition;
 
+		// Suspend any fire showers until level starts
+		fireController.Suspend();
+
 		// Start level
 		Debug.Log("Starting the level in 2 seconds");
 		Invoke("StartLevel", 2);
@@ -98,6 +110,7 @@ public class GameController : MonoBehaviour {
 	private void StartLevel() {
 		Debug.Log("Starting the level: " + currentLevel);
 		SetupSpawnPoints();
+		SetupFireShowers();
 
 		leftSpawn.enabled = true;
 		rightSpawn.enabled = true;
@@ -106,6 +119,19 @@ public class GameController : MonoBehaviour {
 		uiIntroLevel.SetActive(false);
 	}
 
+	/**
+	 * Setup for the fire shower spawner.
+	 */
+	private void SetupFireShowers() {
+		Level level = levelConfig.GetLevel(currentLevel);
+		if (level.fireShowers.Length > 0) {
+			fireController.Setup(level.fireShowers);
+		}
+	}
+
+	/**
+	 * Sets up the enemy spawners.
+	 */
 	private	void SetupSpawnPoints() {
 		Level level = levelConfig.GetLevel(currentLevel);
 
