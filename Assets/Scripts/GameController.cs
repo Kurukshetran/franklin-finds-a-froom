@@ -136,10 +136,10 @@ public class GameController : MonoBehaviour {
 		Level level = levelConfig.GetLevel(currentLevel);
 
 		// Setup configs on the left spawn
-		leftSpawn.Setup(level.leftEnemies, level.leftSpawnStart, level.leftSpawnDelay, level.endlessMode);
+		leftSpawn.Setup(level.leftSpawnConfigs, level.respawnDelay, level.endlessMode);
 
 		// Setup configs on the right spawn
-		rightSpawn.Setup(level.rightEnemies, level.rightSpawnStart, level.rightSpawnDelay, level.endlessMode);
+		rightSpawn.Setup(level.rightSpawnConfigs, level.respawnDelay, level.endlessMode);
 	}
 
 	private void RestartGame() {

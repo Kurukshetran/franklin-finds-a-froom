@@ -26,14 +26,17 @@ public class LevelConfig : MonoBehaviour {
 
 [System.Serializable]
 public class Level {
-	public GameObject[] leftEnemies;
-	public GameObject[] rightEnemies;
-	public float leftSpawnStart;
-	public float leftSpawnDelay;
-	public float rightSpawnStart;
-	public float rightSpawnDelay;
+	public SpawnConfig[] leftSpawnConfigs;
+	public SpawnConfig[] rightSpawnConfigs;
+	public float respawnDelay;
 	public bool endlessMode;
 	public FireShower[] fireShowers;
+}
+
+[System.Serializable]
+public class SpawnConfig {
+	public GameObject spawnObject;
+	public float spawnDelay;
 }
 
 [System.Serializable]

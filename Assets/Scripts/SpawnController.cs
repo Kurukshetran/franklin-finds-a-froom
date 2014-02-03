@@ -10,117 +10,139 @@ public class SpawnController : MonoBehaviour {
 	public bool randomizeEnemies = false;
 
 	// Array of enemy prefabs to spawn.
-	private GameObject[] initialEnemies;
+	private SpawnConfig[] initialSpawns;
 
 	// Array of enemies that are yet to be spawned into the level.
-	private GameObject[] pendingEnemies;
+	private SpawnConfig[] pendingSpawns;
 
 	// Time in seconds between spawns.
-	private float spawnDelay;
+	private float respawnDelay;
 
-	// Time in seconds before the first spawn.
-	private float spawnStart;
-
+	// Vars for endless mode
 	private bool endlessMode;
 	private int endlessSpawnIndex;
 
-	public void Setup(GameObject[] enemies, float start, float delay, bool endless) {
-		initialEnemies = enemies;
-		spawnStart = start;
-		spawnDelay = delay;
+	/**
+	 * Setup the spawn controller.
+	 * 
+	 * @param spawnConfigs Array of spawn configuration settings
+	 * @param delay Time delay for respawns
+	 * @param endless Endless mode flag'
+	 */
+	public void Setup(SpawnConfig[] spawnConfigs, float delay, bool endless) {
+		// Copy configs to both initialSpawns = used for endless mode, and pendingSpawns which is actively used to track
+		// upcoming spawns.
+		initialSpawns = spawnConfigs;
+		pendingSpawns = spawnConfigs;
+
+		// Time delay for respawns
+		respawnDelay = delay;
+
+		// Copy endlessMode flag
 		endlessMode = endless;
-		endlessSpawnIndex = -1;
 
-		pendingEnemies = new GameObject[initialEnemies.Length];
-		for (int i = 0; i < initialEnemies.Length; i++) {
-			GameObject enemy = (GameObject)Instantiate(initialEnemies[i]);
-			enemy.SetActive(false);
-			pendingEnemies[i] = enemy;
-		}
-
-		// First, cancel any previously invoked Spawn() calls
 		CancelInvoke();
 
-		// Then repeat Spawns at set intervals
-		InvokeRepeating("Spawn", spawnStart, spawnDelay);
+		// Get start delay time for the first element and SpawnNext() after that amount of time
+		SpawnNext();
 	}
 
-	private void Spawn() {
-		if (endlessMode) {
-			if (endlessSpawnIndex < initialEnemies.Length - 1) {
-				endlessSpawnIndex++;
-			}
-			else {
-				endlessSpawnIndex = 0;
-			}
-
-			GameObject spawnObj = (GameObject)Instantiate(initialEnemies[endlessSpawnIndex]);
-			spawnObj.transform.position = transform.position;
-			spawnObj.transform.rotation = transform.rotation;
-			
-			EnemyController enemyController = spawnObj.GetComponent<EnemyController>();
-			if (enemyController) {
-				enemyController.SetDirection(directionToRight);
-			}
-			else {
-				DirectionController dirController = spawnObj.GetComponent<DirectionController>();
-				if (dirController) {
-					dirController.SetDirection(directionToRight);
-				}
-			}
-		}
-		else if (pendingEnemies.Length > 0) {
+	/**
+	 * Queues up the next spawn.
+	 */
+	private void SpawnNext() {
+		if (pendingSpawns.Length > 0) {
 			// Instantiate enemy at front of array
-			GameObject spawnObj = pendingEnemies[0];
-			spawnObj.SetActive(true);
-			spawnObj.transform.position = transform.position;
-			spawnObj.transform.rotation = transform.rotation;
-
-			EnemyController enemyController = spawnObj.GetComponent<EnemyController>();
-			if (enemyController) {
-				enemyController.SetDirection(directionToRight);
-				enemyController.ResetProperties();
-			}
-			else {
-				DirectionController dirController = spawnObj.GetComponent<DirectionController>();
-				if (dirController) {
-					dirController.SetDirection(directionToRight);
-				}
-			}
-
-			// Recreate array sans the first element
-			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length - 1];
-			if (pendingEnemies.Length > 1) {
-				for (int i = 1; i < pendingEnemies.Length; i++) {
-					remainingEnemies[i - 1] = pendingEnemies[i];
-				}
-			}
-
-			pendingEnemies = remainingEnemies;
+			SpawnConfig spawnConfig = pendingSpawns[0];
+			Invoke("Spawn", spawnConfig.spawnDelay);
 		}
 	}
 
+	/**
+	 * Spawn the object into the world.
+	 */
+	private void Spawn() {
+		SpawnConfig spawnConfig = pendingSpawns[0];
+
+		// Instantiate the spawn object. Set position and rotation.
+		GameObject spawnObj = (GameObject)Instantiate(spawnConfig.spawnObject);
+
+		// Not sure why, but the first spawn of these things off of prefabs have activeSelf = true. When false,
+		// it indicates that this is a respawn of an old object, so delete this one, and use the clone that was 
+		// instantiated just prior to this.
+		if (!spawnConfig.spawnObject.activeSelf) {
+			Destroy(spawnConfig.spawnObject);
+		}
+
+		// Respawned objects are copied from inactive objects, so need to activate
+		spawnObj.SetActive(true);
+
+		// Set start position at the spawn point
+		spawnObj.transform.position = transform.position;
+		spawnObj.transform.rotation = transform.rotation;
+
+		// Set direction of the spawned object
+		EnemyController enemyController = spawnObj.GetComponent<EnemyController>();
+		if (enemyController) {
+			enemyController.SetDirection(directionToRight);
+			enemyController.ResetProperties();
+		}
+		else {
+			DirectionController dirController = spawnObj.GetComponent<DirectionController>();
+			if (dirController) {
+				dirController.SetDirection(directionToRight);
+			}
+		}
+
+		// Recreate the pendingSpawns array without the first element
+		SpawnConfig[] tmp = new SpawnConfig[pendingSpawns.Length - 1];
+		if (pendingSpawns.Length > 1) {
+			for (int i = 1; i < pendingSpawns.Length; i++) {
+				tmp[i - 1] = pendingSpawns[i];
+			}
+		}
+
+		pendingSpawns = tmp;
+
+		// Queue up the next spawn object
+		SpawnNext();
+	}
+
+	/**
+	 * Re-add enemy to the queue to spawn again.
+	 */
 	public void AddEnemyToQueue(GameObject enemy) {
 		if (endlessMode) {
 			Destroy(enemy);
 		}
 		else {
-			GameObject[] remainingEnemies = new GameObject[pendingEnemies.Length + 1];
-
-			if (pendingEnemies.Length > 0) {
-				pendingEnemies.CopyTo(remainingEnemies, 0);
+			SpawnConfig[] tmpSpawns = new SpawnConfig[pendingSpawns.Length + 1];
+			if (pendingSpawns.Length > 0) {
+				pendingSpawns.CopyTo(tmpSpawns, 0);
 			}
 
+			// Make object inactive. Will be destroyed later when a copy is spawned.
 			enemy.SetActive(false);
-			remainingEnemies[remainingEnemies.Length - 1] = enemy;
 
-			pendingEnemies = remainingEnemies;
+			SpawnConfig config = new SpawnConfig();
+			config.spawnDelay = respawnDelay;
+			config.spawnObject = enemy;
+
+			tmpSpawns[tmpSpawns.Length - 1] = config;
+			pendingSpawns = tmpSpawns;
+
+			if (pendingSpawns.Length == 1) {
+				SpawnNext();
+			}
 		}
 	}
 
+	/**
+	 * Return the number of spawns pending.
+	 */
 	public int GetNumPendingEnemies() {
-		if (pendingEnemies != null)
-			return pendingEnemies.Length;
+		if (pendingSpawns != null)
+			return pendingSpawns.Length;
 		else
 			return -1;
 	}

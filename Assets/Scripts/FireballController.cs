@@ -34,8 +34,9 @@ public class FireballController : MonoBehaviour {
 	}
 
 	private void Start() {
-		System.Random rand = new System.Random();
-		anim.playbackTime = anim.playbackTime * (float)rand.NextDouble();
+		// TODO: randomize start frame for the animation. Otherwise all fireballs play the same animation each frame.
+//		System.Random rand = new System.Random();
+//		anim.playbackTime = anim.playbackTime * (float)rand.NextDouble();
 	}
 
 	private void Update() {
