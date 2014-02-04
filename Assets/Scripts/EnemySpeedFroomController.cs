@@ -67,21 +67,16 @@ public class EnemySpeedFroomController : EnemyController {
 
 					// Player the stomp particle system any time there's a stomp
 					base.particleSysStomp.Play();
+
+					// Play audio for hit
+					AudioSource.PlayClipAtPoint(hitAudio, transform.position);
 				}
 				else {
 					pc.TriggerDeath();
 				}
 			}
 			else if (currState == EnemyState.DISABLED) {
-				collider2D.enabled = false;
-				rigidbody2D.velocity = new Vector2(0, 20f);
-				speed = 0;
-				currState = EnemyState.DEAD;
-				nextState = EnemyState.DEAD;
-
-				gameController.AddToScore(100);
-				
-				Invoke("Destroy", 2);
+				base.KillEnemy();
 			}
 		}
 	}
@@ -106,7 +101,17 @@ public class EnemySpeedFroomController : EnemyController {
 			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
 		}
 
-		base.particleSysBump.Play();
+		// Display particle effects and play audio only if in attackable state
+		if (currState != EnemyState.DISABLED && currState != EnemyState.DISABLED_IMMUNE) {
+			base.particleSysBump.Play();
+
+			if (!hasBoots && base.hitAudio.isReadyToPlay) {
+				AudioSource.PlayClipAtPoint(base.hitAudio, transform.position);
+			}
+			else if(base.bumpBlockedAudio.isReadyToPlay) {
+				AudioSource.PlayClipAtPoint(base.bumpBlockedAudio, transform.position);
+			}
+		}
 	}
 
 	protected void OnCollisionExit2D(Collision2D coll) {

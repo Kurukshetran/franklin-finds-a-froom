@@ -11,7 +11,7 @@ public class CoinController : MonoBehaviour {
 	public float smoothingValue = 6.5f;
 
 	// Sound to play
-	public AudioClip audio;
+	public AudioClip pickupAudio;
 
 	// Coin travels towards the right if set to true. To the left if false.
 	private bool directionToRight = false;
@@ -67,6 +67,6 @@ public class CoinController : MonoBehaviour {
 		pickupFinalYPos = transform.position.y + pickupBounceHeight;
 
 		// Play the sound
-		AudioSource.PlayClipAtPoint(audio, transform.position);
+		AudioSource.PlayClipAtPoint(pickupAudio, transform.position);
 	}
 }

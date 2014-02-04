@@ -24,6 +24,15 @@ public class EnemyController : MonoBehaviour {
 
 	// If hasBoots flag is true, then this is the force applied to the character on bottom bump.
 	public float bumpForceWithBoots = 400f;
+
+	// Audio to play on hit
+	public AudioClip hitAudio;
+
+	// Audio to play on bottom bump that's been blocked
+	public AudioClip bumpBlockedAudio;
+
+	// Audio to play when enemy is kicked while disabled
+	public AudioClip kickAudio;
 	#endregion
 
 	#region References to other game objects
@@ -147,12 +156,29 @@ public class EnemyController : MonoBehaviour {
 			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
 		}
 
-		particleSysBump.Play();
+		// Display particle effects and play audio only if in attackable state
+		if (currState != EnemyState.DISABLED && currState != EnemyState.DISABLED_IMMUNE) {
+			particleSysBump.Play();
+
+			if (!hasBoots) {
+				AudioSource.PlayClipAtPoint(hitAudio, transform.position);
+			}
+			else {
+				AudioSource.PlayClipAtPoint(bumpBlockedAudio, transform.position);
+			}
+		}
 	}
 
 	public void OnStomped() {
 		SetDisabled();
+
+		// Display particle effects
 		particleSysStomp.Play();
+
+		// Play hit audio
+		if (hitAudio.isReadyToPlay) {
+			AudioSource.PlayClipAtPoint(hitAudio, transform.position);
+		}
 	}
 
 	protected virtual void OnCollisionEnter2D(Collision2D coll) {
@@ -173,17 +199,24 @@ public class EnemyController : MonoBehaviour {
 				}
 			}
 		    else if (currState == EnemyState.DISABLED) {
-				collider2D.enabled = false;
-				rigidbody2D.velocity = new Vector2(0, 20f);
-				speed = 0;
-				currState = EnemyState.DEAD;
-				nextState = EnemyState.DEAD;
-
-				gameController.AddToScore(100);
-
-				Invoke("Destroy", 2);
+				KillEnemy();
 			}
 		}
+	}
+
+	protected virtual void KillEnemy() {
+		collider2D.enabled = false;
+		rigidbody2D.velocity = new Vector2(0, 20f);
+		speed = 0;
+		currState = EnemyState.DEAD;
+		nextState = EnemyState.DEAD;
+		
+		// Play kick audio
+		AudioSource.PlayClipAtPoint(kickAudio, transform.position);
+		
+		gameController.AddToScore(100);
+		
+		Invoke("Destroy", 2);
 	}
 
 	void Destroy() {

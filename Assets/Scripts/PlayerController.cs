@@ -33,6 +33,9 @@ public class PlayerController : MonoBehaviour {
 
 	// Time to delay respawn on death
 	public int respawnDelay = 4;
+
+	// Jump audio clip
+	public AudioClip audioJump;
 	#endregion
 
 	#region Private
@@ -148,6 +151,9 @@ public class PlayerController : MonoBehaviour {
 
 			// Apply force for the jump
 			rigidbody2D.AddForce(new Vector2(0, jumpForce));
+
+			// Play the jump sound
+			AudioSource.PlayClipAtPoint(audioJump, transform.position);
 		}
 
 		// Create bounce effect after stomping on an enemy
