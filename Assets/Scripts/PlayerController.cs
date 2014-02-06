@@ -73,14 +73,45 @@ public class PlayerController : MonoBehaviour {
 		if (ignoreInput)
 			return;
 
+		// REALLY RUDIMENTARY MOBILE TOUCH SCREEN SUPPORT. BUT... it works?
+		bool jumpTouchBegan = false;
+		bool jumpTouchContinue = false;
+		bool leftTouched = false;
+		bool rightTouched = false;
+		foreach (Touch touch in Input.touches) {
+			if (touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended) {
+				if ((touch.position.y < Screen.height / 2f) && (touch.position.x > Screen.width * 0.6f)) {
+					if (touch.phase == TouchPhase.Began) {
+						jumpTouchBegan = true;
+					}
+					else {
+						jumpTouchContinue = true;
+					}
+				}
+				else if (touch.position.x < Screen.width * 0.2f) {
+					leftTouched = true;
+				}
+				else if (touch.position.x < Screen.width * 0.4f) {
+					rightTouched = true;
+				}
+			}
+		}
+
+		// And the below is a mix of desktop keyboard input handling along with touch input where applicable
 		float hMovement = Input.GetAxis("Horizontal");
+		if (leftTouched) {
+			hMovement = -1f;
+		}
+		else if (rightTouched) {
+			hMovement = 1f;
+		}
 
 		// Set "Speed" on the animator for the controller to apply the animation if needed
 		animator.SetFloat("Speed", Mathf.Abs(hMovement));
 
 		// Determine movement and animation speed 
 		float speed;
-		if (Input.GetButton("Run")) {
+		if (Input.GetButton("Run") || leftTouched || rightTouched) {
 			isRunning = true;
 			speed = runSpeed;
 			animator.speed = 2;
@@ -116,13 +147,13 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// Flag a jump to occur on the next FixedUpdate
-		if (isOnGround && Input.GetButtonDown("Jump")) {
+		if (isOnGround && (Input.GetButtonDown("Jump") || jumpTouchBegan)) {
 			doJump = true;
 		}
 
 		jumpFloatTimer -= Time.deltaTime;
 		// Adjust gravity scale based on the jump button
-		if (Input.GetButton("Jump") && jumpFloatTimer > 0) {
+		if ((Input.GetButton("Jump") || jumpTouchContinue) && jumpFloatTimer > 0) {
 			rigidbody2D.gravityScale = gravityScaleFloating;
 		}
 		else {
