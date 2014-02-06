@@ -10,8 +10,17 @@ public class CoinController : MonoBehaviour {
 
 	public float smoothingValue = 6.5f;
 
+	// Number of points to reward
+	public int pointValue;
+
+	// Text object to show points received
+	public GameObject pointsIndicator;
+
 	// Sound to play
 	public AudioClip pickupAudio;
+
+	// Game Controller
+	private GameController gameController;
 
 	// Coin travels towards the right if set to true. To the left if false.
 	private bool directionToRight = false;
@@ -19,6 +28,10 @@ public class CoinController : MonoBehaviour {
 	private bool doPickup = false;
 
 	private float pickupFinalYPos;
+
+	private void Awake() {
+		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+	}
 
 	public void FixedUpdate() {
 		// Set direction and velocity of the coin
@@ -68,5 +81,9 @@ public class CoinController : MonoBehaviour {
 
 		// Play the sound
 		AudioSource.PlayClipAtPoint(pickupAudio, transform.position);
+
+		// Display and add the points
+		GameObject pointsText = (GameObject)Instantiate(pointsIndicator);
+		pointsText.GetComponent<PointsIndicator>().AddPoints(pointValue, transform.position);
 	}
 }

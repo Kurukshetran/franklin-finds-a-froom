@@ -25,18 +25,25 @@ public class EnemyController : MonoBehaviour {
 	// If hasBoots flag is true, then this is the force applied to the character on bottom bump.
 	public float bumpForceWithBoots = 400f;
 
-	// Audio to play on hit
-	public AudioClip hitAudio;
-
-	// Audio to play on bottom bump that's been blocked
-	public AudioClip bumpBlockedAudio;
-
-	// Audio to play when enemy is kicked while disabled
-	public AudioClip kickAudio;
+	// Number of points to reward
+	public int pointValue;
 	#endregion
 
 	#region References to other game objects
+	// Game Controller
 	protected GameController gameController;
+
+	// Audio to play on hit
+	public AudioClip hitAudio;
+	
+	// Audio to play on bottom bump that's been blocked
+	public AudioClip bumpBlockedAudio;
+	
+	// Audio to play when enemy is kicked while disabled
+	public AudioClip kickAudio;
+
+	// Text object to show points received
+	public GameObject pointsIndicator;
 	#endregion
 
 	#region Internal vars
@@ -70,7 +77,10 @@ public class EnemyController : MonoBehaviour {
 	#endregion
 
 	protected virtual void Awake() {
+		// GameController
 		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+
+		// Particle effects played on hits
 		particleSysStomp = transform.FindChild("particleSystem_stomp").GetComponent<ParticleSystem>();
 		particleSysBump = transform.FindChild("particleSystem_bump").GetComponent<ParticleSystem>();
 	}
@@ -192,7 +202,6 @@ public class EnemyController : MonoBehaviour {
 					OnStomped();
 
 					pc.OnEnemyStomp();
-					gameController.AddToScore(50);
 				}
 				else {
 					pc.TriggerDeath();
@@ -213,10 +222,31 @@ public class EnemyController : MonoBehaviour {
 		
 		// Play kick audio
 		AudioSource.PlayClipAtPoint(kickAudio, transform.position);
-		
-		gameController.AddToScore(100);
+
+		AddPoints(pointValue);
 		
 		Invoke("Destroy", 2);
+	}
+
+	/**
+	 * Add points. Display points text and add to the game total.
+	 * 
+	 * @param int points Points to add
+	 */
+	public void AddPoints(int points) {
+		GameObject pointsText = (GameObject)Instantiate(pointsIndicator);
+		pointsText.GetComponent<PointsIndicator>().AddPoints(points, transform.position);
+	}
+
+	/**
+	 * Add points. Display points text and add to the game total.
+	 * 
+	 * @param int points Points to add
+	 * @param Vector3 startPosOverride Override starting position for the text to animate from
+	 */
+	public void AddPoints(int points, Vector3 startPosOverride) {
+		GameObject pointsText = (GameObject)Instantiate(pointsIndicator);
+		pointsText.GetComponent<PointsIndicator>().AddPoints(points, startPosOverride);
 	}
 
 	void Destroy() {

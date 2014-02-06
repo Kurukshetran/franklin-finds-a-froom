@@ -12,14 +12,14 @@ public class GameController : MonoBehaviour {
 	// UI Text displaying remaining lives
 	public GameObject uiLives;
 
-	// UI Text displaying current level
-	public GameObject uiLevel;
-
 	// UI Text displaying score
 	public GameObject uiScore;
 
 	// UI Text to to display level on intro
 	public GameObject uiIntroLevel;
+
+	// Level config container
+	public GameObject levelConfigContainer;
 
 	// Reference to the player
 	public GameObject player;
@@ -49,7 +49,7 @@ public class GameController : MonoBehaviour {
 
 	void Awake() {
 		// Level config
-		levelConfig = GameObject.FindGameObjectWithTag("LevelConfig").GetComponent<LevelConfig>();
+		levelConfig = levelConfigContainer.GetComponent<LevelConfig>();
 
 		// Spawn points
 		GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
@@ -152,10 +152,6 @@ public class GameController : MonoBehaviour {
 	private void UpdateGUI() {
 		if (uiLives && uiLives.guiText) {
 			uiLives.guiText.text = "Remaining Lives: " + currentLives;
-		}
-
-		if (uiLevel && uiLevel.guiText) {
-			uiLevel.guiText.text = "Level: " + currentLevel;
 		}
 
 		if (uiScore && uiScore.guiText) {
