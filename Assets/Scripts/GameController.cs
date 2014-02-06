@@ -6,6 +6,9 @@ public class GameController : MonoBehaviour {
 	#region Public
 	// Number of lives the player can start out with
 	public int startingLives = 3;
+
+	// Intended for development. Sets the starting level.
+	public int startingLevel = 0;
 	#endregion
 
 	#region Handlers to other GameObjects
@@ -70,6 +73,9 @@ public class GameController : MonoBehaviour {
 		// Starting # of lives
 		currentLives = startingLives;
 
+		// Starting level
+		currentLevel = startingLevel;
+
 		// Starting score
 		score = 0;
 
@@ -94,7 +100,9 @@ public class GameController : MonoBehaviour {
 
 		// Show intro level UI
 		uiIntroLevel.SetActive(true);
-		uiIntroLevel.guiText.text = "Level " + currentLevel;
+
+		// +1 since it starts at 0
+		uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
 
 		// Move player to beginning state
 		player.transform.position = playerStartingPosition;
@@ -143,7 +151,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void RestartGame() {
-		currentLevel = 0;
+		currentLevel = startingLevel;
 		currentLives = startingLives;
 		score = 0;
 		ResetGameState();

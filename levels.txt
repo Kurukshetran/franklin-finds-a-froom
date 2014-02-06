@@ -1,0 +1,87 @@
+Level 1
+=======
+1 Reg       6 Reg
+8 Reg       6 Reg
+6 Reg       6 Reg
+
+Level 2
+=======
+7 Reg       1 Reg
+3 Reg       3 Reg
+3 Reg       3 Reg
+6 Speed     6 Speed
+
+Level 3
+=======
+1 Reg       4 Reg
+6 Reg       6 Reg
+6 Reg       6 Reg
+9 Speed     9 Speed
+6 Speed     6 Speed
+6 Speed     6 Speed
+
+Level 4
+=======
+5 Jump      1 Jump
+3 Reg       3 Reg
+5 Jump      5 Jump
+3 Speed     3 Speed
+3 Jump      3 Jump
+
+Level 5
+=======
+7 RegH      1 RegH
+5 RegH      5 RegH
+5 RegH      5 RegH
+6 Speed     6 Speed
+6 Speed     6 Speed
+
+Level 6
+=======
+1 RegH      7 RegH
+6 RegH
+6 RegH
+6 SpeedH
+6 SpeedH
+6 Jump
+
+Level 7
+=======
+7 JumpH     1 JumpH
+SpeedH
+RegH
+JumpH
+SpeedH
+RegH
+
+Level 8
+=======
+1 RegB      4 RegB
+RegB
+RegB
+RegH
+RegH
+RegH
+
+Level 9
+=======
+4 RegB
+RegH
+RegB
+RegH
+SpeedB
+SpeedH
+FIRE: 23 @ 5s / 40g
+
+SpeedH
+JumpB
+RegH
+Reg
+Speed
+SpeedB
+JumpH
+RegB
+Jump
+FIRE: 23 @ 6s
+FIRE: 25 @ 20s || # of enemies destroyed?
+
