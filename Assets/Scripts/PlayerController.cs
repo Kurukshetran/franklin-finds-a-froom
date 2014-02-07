@@ -88,10 +88,10 @@ public class PlayerController : MonoBehaviour {
 						jumpTouchContinue = true;
 					}
 				}
-				else if (touch.position.x < Screen.width * 0.2f) {
+				else if (touch.position.x < Screen.width * 0.15f) {
 					leftTouched = true;
 				}
-				else if (touch.position.x < Screen.width * 0.4f) {
+				else if (touch.position.x < Screen.width * 0.3f) {
 					rightTouched = true;
 				}
 			}
