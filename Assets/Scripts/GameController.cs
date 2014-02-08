@@ -12,8 +12,8 @@ public class GameController : MonoBehaviour {
 	#endregion
 
 	#region Handlers to other GameObjects
-	// UI Text displaying remaining lives
-	public GameObject uiLives;
+	// Container where the life icons will go
+	public GameObject uiLivesContainer;
 
 	// UI Text displaying score
 	public GameObject uiScore;
@@ -48,6 +48,9 @@ public class GameController : MonoBehaviour {
 
 	// Controller to the fire shower spawner
 	private FireShowerController fireController;
+
+	// Handle to LivesUI script
+	private LivesUI livesUI;
 	#endregion
 
 	void Awake() {
@@ -69,6 +72,9 @@ public class GameController : MonoBehaviour {
 
 		// Fire shower controller
 		fireController = fireSpawner.GetComponent<FireShowerController>();
+
+		// Controls lives icon
+		livesUI = uiLivesContainer.GetComponent<LivesUI>();
 
 		// Starting # of lives
 		currentLives = startingLives;
@@ -158,8 +164,8 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void UpdateGUI() {
-		if (uiLives && uiLives.guiText) {
-			uiLives.guiText.text = "Remaining Lives: " + currentLives;
+		if (livesUI) {
+			livesUI.UpdateRemainingLives(currentLives);
 		}
 
 		if (uiScore && uiScore.guiText) {
