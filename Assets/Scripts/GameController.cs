@@ -117,12 +117,10 @@ public class GameController : MonoBehaviour {
 		fireController.Suspend();
 
 		// Start level
-		Debug.Log("Starting the level in 2 seconds");
 		Invoke("StartLevel", 2);
 	}
 
 	private void StartLevel() {
-		Debug.Log("Starting the level: " + currentLevel);
 		SetupSpawnPoints();
 		SetupFireShowers();
 
