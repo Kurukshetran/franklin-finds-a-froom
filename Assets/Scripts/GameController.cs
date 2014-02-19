@@ -40,7 +40,14 @@ public class GameController : MonoBehaviour {
 
 	private int currentLevel = 0;
 
+	// Total points accumulated
 	private int score;
+
+	// Total # of coins collected
+	private int coinsCollected;
+
+	// Number of coins needed to add life
+	private int coinsFor1Up = 10;
 
 	private LevelConfig levelConfig;
 	private SpawnController leftSpawn;
@@ -84,6 +91,9 @@ public class GameController : MonoBehaviour {
 
 		// Starting score
 		score = 0;
+
+		// Starting coins
+		coinsCollected = 0;
 
 		ResetGameState();
 	}
@@ -216,5 +226,8 @@ public class GameController : MonoBehaviour {
 		score += addPoints;
 		UpdateGUI();
 	}
-	
+
+	public void AddCoinCollected() {
+		coinsCollected++;
+	}
 }
