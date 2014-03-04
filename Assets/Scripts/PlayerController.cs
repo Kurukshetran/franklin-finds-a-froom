@@ -38,6 +38,16 @@ public class PlayerController : MonoBehaviour {
 	public AudioClip audioJump;
 	#endregion
 
+	#region UI
+	public GUITexture leftTouchButton;
+	public GUITexture rightTouchButton;
+	public GUITexture jumpTouchButton;
+	public GUITexture pauseTouchButton;
+
+	private float uiPressedAlpha = 0.5f;
+	private float uiUnpressedAlpha = 0.137f;
+	#endregion
+
 	#region Private
 	// Game controller
 	private GameController gameController;
@@ -73,28 +83,46 @@ public class PlayerController : MonoBehaviour {
 		if (ignoreInput)
 			return;
 
-		// REALLY RUDIMENTARY MOBILE TOUCH SCREEN SUPPORT. BUT... it works?
+		// Mobile touch screen support
 		bool jumpTouchBegan = false;
 		bool jumpTouchContinue = false;
 		bool leftTouched = false;
 		bool rightTouched = false;
 		foreach (Touch touch in Input.touches) {
+			// Detect if button is touched
 			if (touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended) {
-				if ((touch.position.y < Screen.height / 2f) && (touch.position.x > Screen.width * 0.6f)) {
+				if (jumpTouchButton.HitTest(touch.position)) {
 					if (touch.phase == TouchPhase.Began) {
 						jumpTouchBegan = true;
 					}
 					else {
 						jumpTouchContinue = true;
 					}
+
+					jumpTouchButton.color = new Color(jumpTouchButton.color.r, jumpTouchButton.color.g, jumpTouchButton.color.b, uiPressedAlpha);
 				}
-				else if (touch.position.x < Screen.width * 0.15f) {
+				else if (leftTouchButton.HitTest(touch.position)) {
 					leftTouched = true;
+					leftTouchButton.color = new Color(leftTouchButton.color.r, leftTouchButton.color.g, leftTouchButton.color.b, uiPressedAlpha);
 				}
-				else if (touch.position.x < Screen.width * 0.3f) {
+				else if (rightTouchButton.HitTest(touch.position)) {
 					rightTouched = true;
+					rightTouchButton.color = new Color(rightTouchButton.color.r, rightTouchButton.color.g, rightTouchButton.color.b, uiPressedAlpha);
 				}
 			}
+		}
+
+		// If button is untouched, change the alpha back to more transparent state
+		if (!jumpTouchBegan && !jumpTouchContinue && jumpTouchButton.color.a == uiPressedAlpha) {
+			jumpTouchButton.color = new Color(jumpTouchButton.color.r, jumpTouchButton.color.g, jumpTouchButton.color.b, uiUnpressedAlpha);
+		}
+
+		if (!leftTouched && leftTouchButton.color.a == uiPressedAlpha) {
+			leftTouchButton.color = new Color(leftTouchButton.color.r, leftTouchButton.color.g, leftTouchButton.color.b, uiUnpressedAlpha);
+		}
+
+		if (!rightTouched && rightTouchButton.color.a == uiPressedAlpha) {
+			rightTouchButton.color = new Color(rightTouchButton.color.r, rightTouchButton.color.g, rightTouchButton.color.b, uiUnpressedAlpha);
 		}
 
 		// And the below is a mix of desktop keyboard input handling along with touch input where applicable
