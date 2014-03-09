@@ -9,6 +9,11 @@ public class GameController : MonoBehaviour {
 
 	// Intended for development. Sets the starting level.
 	public int startingLevel = 0;
+
+	// Background music.
+	public AudioSource bgAudioSource;
+	public AudioClip bgMusic1;
+	public AudioClip bgMusic2;
 	#endregion
 
 	#region Handlers to other GameObjects
@@ -126,6 +131,25 @@ public class GameController : MonoBehaviour {
 		// Suspend any fire showers until level starts
 		fireController.Suspend();
 
+		// Start the music
+		// Use bgMusic1 if on a level 3 or earlier.
+		if (currentLevel < 3) {
+			bgAudioSource.clip = bgMusic1;
+		}
+		// Randomly select the background music to play.
+		else {
+			System.Random random = new System.Random();
+			int randResult = random.Next(0, 2);
+			if (randResult == 1) {
+				bgAudioSource.clip = bgMusic1;
+			}
+			else {
+				bgAudioSource.clip = bgMusic2;
+			}
+		}
+		bgAudioSource.Play();
+
+
 		// Start level
 		Invoke("StartLevel", 2);
 	}
@@ -164,6 +188,9 @@ public class GameController : MonoBehaviour {
 		rightSpawn.Setup(level.rightSpawnConfigs, level.respawnDelay, level.endlessMode);
 	}
 
+	/**
+	 * Set initial starting values after all lives have been lost and the game's restarting.
+	 */
 	private void RestartGame() {
 		currentLevel = startingLevel;
 		currentLives = startingLives;
@@ -229,5 +256,12 @@ public class GameController : MonoBehaviour {
 
 	public void AddCoinCollected() {
 		coinsCollected++;
+	}
+
+	/**
+	 * Stop playing the background music.
+	 */
+	public void StopBackgroundMusic() {
+		bgAudioSource.Stop();
 	}
 }

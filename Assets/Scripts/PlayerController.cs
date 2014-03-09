@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour {
 
 	// Jump audio clip
 	public AudioClip audioJump;
+
+	// Death audio clip
+	public AudioClip audioDeath;
 	#endregion
 
 	#region UI
@@ -236,6 +239,10 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void TriggerDeath() {
+		// Play death audio
+		AudioSource.PlayClipAtPoint(audioDeath, transform.position);
+		gameController.StopBackgroundMusic();
+
 		// Trigger death animation
 		animator.SetBool("Dead", true);
 
