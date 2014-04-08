@@ -20,6 +20,9 @@ public class GameController : MonoBehaviour {
 	// Container where the life icons will go
 	public GameObject uiLivesContainer;
 
+	// Container for end game UI elements
+	public GameObject uiEndGameContainer;
+
 	// UI Text displaying score
 	public GameObject uiScore;
 
@@ -63,6 +66,9 @@ public class GameController : MonoBehaviour {
 
 	// Handle to LivesUI script
 	private LivesUI livesUI;
+
+	// EndGameUI script
+	private EndGameUI endGameUI;
 	#endregion
 
 	void Awake() {
@@ -100,6 +106,9 @@ public class GameController : MonoBehaviour {
 		// Starting coins
 		coinsCollected = 0;
 
+		// Controls the end game UI
+		endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
+
 		ResetGameState();
 	}
 
@@ -124,6 +133,9 @@ public class GameController : MonoBehaviour {
 
 		// +1 since it starts at 0
 		uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
+
+		// Remove any end game UI
+		endGameUI.HideEndGameMenu();
 
 		// Move player to beginning state
 		player.transform.position = playerStartingPosition;
@@ -245,7 +257,7 @@ public class GameController : MonoBehaviour {
 		UpdateGUI();
 
 		if (currentLives < 0) {
-			RestartGame();
+			StartEndGameState();
 		}
 	}
 
@@ -264,4 +276,15 @@ public class GameController : MonoBehaviour {
 	public void StopBackgroundMusic() {
 		bgAudioSource.Stop();
 	}
+
+	/**
+	 *  Start of the end game state after last life is lost.
+	 */
+	private void StartEndGameState() {
+		endGameUI.ShowEndGameMenu();
+
+		// @todo Make RestartGame() public and have EndGameUI call it if restart button is hit.
+		Invoke("RestartGame", 5);
+	}
+
 }
