@@ -10,6 +10,9 @@ public class GameController : MonoBehaviour {
 	// Intended for development. Sets the starting level.
 	public int startingLevel = 0;
 
+	// Number of seconds before showing end game UI.
+	public int endGameUiDelay = 2;
+
 	// Background music.
 	public AudioSource bgAudioSource;
 	public AudioClip bgMusic1;
@@ -257,7 +260,7 @@ public class GameController : MonoBehaviour {
 		UpdateGUI();
 
 		if (currentLives < 0) {
-			StartEndGameState();
+			Invoke("StartEndGameState", endGameUiDelay);
 		}
 	}
 
