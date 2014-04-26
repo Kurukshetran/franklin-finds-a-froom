@@ -3,6 +3,8 @@ using System.Collections;
 
 public class EndGameUI : MonoBehaviour {
 
+    private static string HIGH_SCORE_KEY = "HIGH_SCORE";
+
     private bool isVisible;
 
     #region Reference to other objects
@@ -16,9 +18,9 @@ public class EndGameUI : MonoBehaviour {
     #endregion
 
     #region UI elements to show
-    public GameObject gameOver;
-    public GameObject gameScore;
-    public GameObject highScore;
+    public GameObject gameOverUi;
+    public GameObject gameScoreUi;
+    public GameObject highScoreUi;
     public GUITexture menuBg;
     public GUITexture exitTouchButton;
     public GUITexture restartTouchButton;
@@ -82,9 +84,9 @@ public class EndGameUI : MonoBehaviour {
         jumpTouchButton.guiTexture.enabled = false;
 
         // Enable and show end game menu's UI
-        gameOver.SetActive(true);
-        gameScore.SetActive(true);
-        highScore.SetActive(true);
+        gameOverUi.SetActive(true);
+        gameScoreUi.SetActive(true);
+        highScoreUi.SetActive(true);
         menuBg.guiTexture.enabled = true;
         exitTouchButton.guiTexture.enabled = true;
         restartTouchButton.guiTexture.enabled = true;
@@ -97,9 +99,9 @@ public class EndGameUI : MonoBehaviour {
         isVisible = false;
 
         // Hide the end game menu's UI elements
-        gameOver.SetActive(false);
-        gameScore.SetActive(false);
-        highScore.SetActive(false);
+        gameOverUi.SetActive(false);
+        gameScoreUi.SetActive(false);
+        highScoreUi.SetActive(false);
         menuBg.guiTexture.enabled = false;
         exitTouchButton.guiTexture.enabled = false;
         restartTouchButton.guiTexture.enabled = false;
@@ -109,8 +111,38 @@ public class EndGameUI : MonoBehaviour {
      * Set the text to show for the game score UI.
      */
     public void SetGameScoreUI(int score) {
-        if (gameScore && gameScore.guiText) {
-            gameScore.guiText.text = "Score: " + score;
+        // Current game score
+        if (gameScoreUi && gameScoreUi.guiText) {
+            string strScore;
+            if (score == 0) {
+                strScore = "000";
+            }
+            else {
+                strScore = score.ToString();
+            }
+
+            gameScoreUi.guiText.text = "Score: " + strScore;
+        }
+
+        // Overall high score
+        int highScore = PlayerPrefs.GetInt(HIGH_SCORE_KEY);
+        if (score > highScore) {
+            // Update the high score saved in PlayerPrefs
+            highScore = score;
+            PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
+        }
+
+        // Display to the UI
+        if (highScoreUi && highScoreUi.guiText) {
+            string strHighScore;
+            if (highScore == 0) {
+                strHighScore = "000";
+            }
+            else {
+                strHighScore = highScore.ToString();
+            }
+            
+            highScoreUi.guiText.text = "High Score: " + strHighScore;
         }
     }
 }
