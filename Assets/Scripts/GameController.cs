@@ -206,7 +206,7 @@ public class GameController : MonoBehaviour {
 	/**
 	 * Set initial starting values after all lives have been lost and the game's restarting.
 	 */
-	private void RestartGame() {
+	public void RestartGame() {
 		currentLevel = startingLevel;
 		currentLives = startingLives;
 		score = 0;
@@ -285,9 +285,7 @@ public class GameController : MonoBehaviour {
 	 */
 	private void StartEndGameState() {
 		endGameUI.ShowEndGameMenu();
-
-		// @todo Make RestartGame() public and have EndGameUI call it if restart button is hit.
-		Invoke("RestartGame", 5);
+		endGameUI.SetGameScoreUI(score);
 	}
 
 }

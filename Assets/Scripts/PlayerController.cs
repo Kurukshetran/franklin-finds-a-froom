@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour {
 	public GUITexture leftTouchButton;
 	public GUITexture rightTouchButton;
 	public GUITexture jumpTouchButton;
-	public GUITexture pauseTouchButton;
 
 	private float uiPressedAlpha = 0.5f;
 	private float uiUnpressedAlpha = 0.137f;
