@@ -6,8 +6,7 @@ public class EndGameUI : MonoBehaviour {
     private bool isVisible;
 
     #region Reference to other objects
-    public GameObject gameControllerContainer;
-    private GameController gameController;
+    public PlayerController playerController;
     #endregion
 
     #region UI elements to hide
@@ -30,10 +29,6 @@ public class EndGameUI : MonoBehaviour {
 
         if (menuBg != null) {
             menuBg.guiTexture.pixelInset = new Rect(0, 0, Screen.width, Screen.height);
-        }
-
-        if (gameControllerContainer != null) {
-            gameController = gameControllerContainer.GetComponent<GameController>();
         }
     }
 
@@ -71,7 +66,7 @@ public class EndGameUI : MonoBehaviour {
             Debug.Log("TODO: Implement game exit");
         }
         else if (restartGame) {
-            gameController.RestartGame();
+            playerController.Respawn();
         }
     }
 
