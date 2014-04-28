@@ -8,7 +8,7 @@ public class EndGameUI : MonoBehaviour {
     private bool isVisible;
 
     #region Reference to other objects
-    public PlayerController playerController;
+    public GameController gameController;
     #endregion
 
     #region UI elements to hide
@@ -68,7 +68,7 @@ public class EndGameUI : MonoBehaviour {
             Debug.Log("TODO: Implement game exit");
         }
         else if (restartGame) {
-            playerController.Respawn();
+            gameController.RestartGame();
         }
     }
 

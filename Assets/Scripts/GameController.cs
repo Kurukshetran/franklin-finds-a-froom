@@ -3,289 +3,297 @@ using System.Collections;
 
 public class GameController : MonoBehaviour {
 
-	#region Public
-	// Number of lives the player can start out with
-	public int startingLives = 3;
+    #region Public
+    // Number of lives the player can start out with
+    public int startingLives = 3;
 
-	// Intended for development. Sets the starting level.
-	public int startingLevel = 0;
+    // Intended for development. Sets the starting level.
+    public int startingLevel = 0;
 
-	// Number of seconds before showing end game UI.
-	public int endGameUiDelay = 2;
+    // Number of seconds before showing end game UI.
+    public int endGameUiDelay = 2;
 
-	// Background music.
-	public AudioSource bgAudioSource;
-	public AudioClip bgMusic1;
-	public AudioClip bgMusic2;
-	#endregion
+    // Background music.
+    public AudioSource bgAudioSource;
+    public AudioClip bgMusic1;
+    public AudioClip bgMusic2;
+    #endregion
 
-	#region Handlers to other GameObjects
-	// Container where the life icons will go
-	public GameObject uiLivesContainer;
+    #region Handlers to other GameObjects
+    // Container where the life icons will go
+    public GameObject uiLivesContainer;
 
-	// Container for end game UI elements
-	public GameObject uiEndGameContainer;
+    // Container for end game UI elements
+    public GameObject uiEndGameContainer;
 
-	// UI Text displaying score
-	public GameObject uiScore;
+    // UI Text displaying score
+    public GameObject uiScore;
 
-	// UI Text to to display level on intro
-	public GameObject uiIntroLevel;
+    // UI Text to to display level on intro
+    public GameObject uiIntroLevel;
 
-	// Level config container
-	public GameObject levelConfigContainer;
+    // Level config container
+    public GameObject levelConfigContainer;
 
-	// Reference to the player
-	public GameObject player;
+    // Reference to the player
+    public GameObject player;
 
-	// The player's starting position
-	public Vector3 playerStartingPosition;
+    // Reference to the PlayerController
+    private PlayerController playerController;
 
-	// Fire shower spawn object
-	public GameObject fireSpawner;
-	#endregion
+    // The player's starting position
+    public Vector3 playerStartingPosition;
 
-	#region Private
-	// Current number of lives the player has remaining
-	private int currentLives;
+    // Fire shower spawn object
+    public GameObject fireSpawner;
+    #endregion
 
-	private int currentLevel = 0;
+    #region Private
+    // Current number of lives the player has remaining
+    private int currentLives;
 
-	// Total points accumulated
-	private int score;
+    private int currentLevel = 0;
 
-	// Total # of coins collected
-	private int coinsCollected;
+    // Total points accumulated
+    private int score;
 
-	// Number of coins needed to add life
-	private int coinsFor1Up = 10;
+    // Total # of coins collected
+    private int coinsCollected;
 
-	private LevelConfig levelConfig;
-	private SpawnController leftSpawn;
-	private SpawnController rightSpawn;
+    // Number of coins needed to add life
+    private int coinsFor1Up = 10;
 
-	// Controller to the fire shower spawner
-	private FireShowerController fireController;
+    private LevelConfig levelConfig;
+    private SpawnController leftSpawn;
+    private SpawnController rightSpawn;
 
-	// Handle to LivesUI script
-	private LivesUI livesUI;
+    // Controller to the fire shower spawner
+    private FireShowerController fireController;
 
-	// EndGameUI script
-	private EndGameUI endGameUI;
-	#endregion
+    // Handle to LivesUI script
+    private LivesUI livesUI;
 
-	void Awake() {
-		// Level config
-		levelConfig = levelConfigContainer.GetComponent<LevelConfig>();
+    // EndGameUI script
+    private EndGameUI endGameUI;
+    #endregion
 
-		// Spawn points
-		GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
-		foreach(GameObject spawnPoint in spawnPoints) {
-			if (spawnPoint.name == "leftSpawn") {
-				leftSpawn = spawnPoint.GetComponent<SpawnController>();
-				leftSpawn.enabled = false;
-			}
-			else if (spawnPoint.name == "rightSpawn") {
-				rightSpawn = spawnPoint.GetComponent<SpawnController>();
-				rightSpawn.enabled = false;
-			}
-		}
+    void Awake() {
+        // Level config
+        levelConfig = levelConfigContainer.GetComponent<LevelConfig>();
 
-		// Fire shower controller
-		fireController = fireSpawner.GetComponent<FireShowerController>();
+        // Spawn points
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+        foreach(GameObject spawnPoint in spawnPoints) {
+            if (spawnPoint.name == "leftSpawn") {
+                leftSpawn = spawnPoint.GetComponent<SpawnController>();
+                leftSpawn.enabled = false;
+            }
+            else if (spawnPoint.name == "rightSpawn") {
+                rightSpawn = spawnPoint.GetComponent<SpawnController>();
+                rightSpawn.enabled = false;
+            }
+        }
 
-		// Controls lives icon
-		livesUI = uiLivesContainer.GetComponent<LivesUI>();
+        // Player controller
+        playerController = player.GetComponent<PlayerController>();
 
-		// Starting # of lives
-		currentLives = startingLives;
+        // Fire shower controller
+        fireController = fireSpawner.GetComponent<FireShowerController>();
 
-		// Starting level
-		currentLevel = startingLevel;
+        // Controls lives icon
+        livesUI = uiLivesContainer.GetComponent<LivesUI>();
 
-		// Starting score
-		score = 0;
+        // Starting # of lives
+        currentLives = startingLives;
 
-		// Starting coins
-		coinsCollected = 0;
+        // Starting level
+        currentLevel = startingLevel;
 
-		// Controls the end game UI
-		endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
+        // Starting score
+        score = 0;
 
-		ResetGameState();
-	}
+        // Starting coins
+        coinsCollected = 0;
 
-	/**
-	 * Reset the state of the level. Includes clearing the enemies off the screen and resetting the UI.
-	 */
-	public void ResetGameState() {
-		// Clear objects off the scene
-		GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		foreach(GameObject obj in objects) {
-			// 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
-			if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
-				Destroy(obj);
-			}
-		}
-		
-		// Setup UI
-		UpdateGUI();
+        // Controls the end game UI
+        endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
 
-		// Show intro level UI
-		uiIntroLevel.SetActive(true);
+        ResetGameState();
+    }
 
-		// +1 since it starts at 0
-		uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
+    /**
+     * Reset the state of the level. Includes clearing the enemies off the screen and resetting the UI.
+     */
+    public void ResetGameState() {
+        // Clear objects off the scene
+        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach(GameObject obj in objects) {
+            // 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
+            if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
+                Destroy(obj);
+            }
+        }
 
-		// Remove any end game UI
-		endGameUI.HideEndGameMenu();
+        // Setup UI
+        UpdateGUI();
 
-		// Move player to beginning state
-		player.transform.position = playerStartingPosition;
+        // Show intro level UI
+        uiIntroLevel.SetActive(true);
 
-		// Suspend any fire showers until level starts
-		fireController.Suspend();
+        // +1 since it starts at 0
+        uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
 
-		// Start the music
-		// Use bgMusic1 if on a level 3 or earlier.
-		if (currentLevel < 3) {
-			bgAudioSource.clip = bgMusic1;
-		}
-		// Randomly select the background music to play.
-		else {
-			System.Random random = new System.Random();
-			int randResult = random.Next(0, 2);
-			if (randResult == 1) {
-				bgAudioSource.clip = bgMusic1;
-			}
-			else {
-				bgAudioSource.clip = bgMusic2;
-			}
-		}
-		bgAudioSource.Play();
+        // Remove any end game UI
+        endGameUI.HideEndGameMenu();
+
+        // Move player to beginning state
+        player.transform.position = playerStartingPosition;
+
+        // Suspend any fire showers until level starts
+        fireController.Suspend();
+
+        // Start the music
+        // Use bgMusic1 if on a level 3 or earlier.
+        if (currentLevel < 3) {
+            bgAudioSource.clip = bgMusic1;
+        }
+        // Randomly select the background music to play.
+        else {
+            System.Random random = new System.Random();
+            int randResult = random.Next(0, 2);
+            if (randResult == 1) {
+                bgAudioSource.clip = bgMusic1;
+            }
+            else {
+                bgAudioSource.clip = bgMusic2;
+            }
+        }
+        bgAudioSource.Play();
 
 
-		// Start level
-		Invoke("StartLevel", 2);
-	}
+        // Start level
+        Invoke("StartLevel", 2);
+    }
 
-	private void StartLevel() {
-		SetupSpawnPoints();
-		SetupFireShowers();
+    private void StartLevel() {
+        SetupSpawnPoints();
+        SetupFireShowers();
 
-		leftSpawn.enabled = true;
-		rightSpawn.enabled = true;
+        leftSpawn.enabled = true;
+        rightSpawn.enabled = true;
 
-		// Hide intro level UI
-		uiIntroLevel.SetActive(false);
-	}
+        // Hide intro level UI
+        uiIntroLevel.SetActive(false);
+    }
 
-	/**
-	 * Setup for the fire shower spawner.
-	 */
-	private void SetupFireShowers() {
-		Level level = levelConfig.GetLevel(currentLevel);
-		if (level.fireShowers.Length > 0) {
-			fireController.Setup(level.fireShowers);
-		}
-	}
+    /**
+     * Setup for the fire shower spawner.
+     */
+    private void SetupFireShowers() {
+        Level level = levelConfig.GetLevel(currentLevel);
+        if (level.fireShowers.Length > 0) {
+            fireController.Setup(level.fireShowers);
+        }
+    }
 
-	/**
-	 * Sets up the enemy spawners.
-	 */
-	private	void SetupSpawnPoints() {
-		Level level = levelConfig.GetLevel(currentLevel);
+    /**
+     * Sets up the enemy spawners.
+     */
+    private void SetupSpawnPoints() {
+        Level level = levelConfig.GetLevel(currentLevel);
 
-		// Setup configs on the left spawn
-		leftSpawn.Setup(level.leftSpawnConfigs, level.respawnDelay, level.endlessMode);
+        // Setup configs on the left spawn
+        leftSpawn.Setup(level.leftSpawnConfigs, level.respawnDelay, level.endlessMode);
 
-		// Setup configs on the right spawn
-		rightSpawn.Setup(level.rightSpawnConfigs, level.respawnDelay, level.endlessMode);
-	}
+        // Setup configs on the right spawn
+        rightSpawn.Setup(level.rightSpawnConfigs, level.respawnDelay, level.endlessMode);
+    }
 
-	/**
-	 * Set initial starting values after all lives have been lost and the game's restarting.
-	 */
-	public void RestartGame() {
-		currentLevel = startingLevel;
-		currentLives = startingLives;
-		score = 0;
-		ResetGameState();
-	}
+    /**
+     * Set initial starting values after all lives have been lost and the game's restarting.
+     */
+    public void RestartGame() {
+        currentLevel = startingLevel;
+        currentLives = startingLives;
+        score = 0;
 
-	private void UpdateGUI() {
-		if (livesUI) {
-			livesUI.UpdateRemainingLives(currentLives);
-		}
+        // PlayerController.Respawn() will also call GameController.ResetGameState()
+        playerController.Respawn();
+    }
 
-		if (uiScore && uiScore.guiText) {
-			uiScore.guiText.text = "Score: " + score;
-		}
-	}
+    private void UpdateGUI() {
+        if (livesUI) {
+            livesUI.UpdateRemainingLives(currentLives);
+        }
 
-	private void TriggerLevelComplete() {
-		Debug.Log("level complete. start next level.");
+        if (uiScore && uiScore.guiText) {
+            uiScore.guiText.text = "Score: " + score;
+        }
+    }
 
-		currentLevel++;
-		ResetGameState();
-	}
+    private void TriggerLevelComplete() {
+        Debug.Log("level complete. start next level.");
 
-	public void CheckIfLevelCompleted() {
-		// Checking if any pending enemies to be spawned or if this is an endless mode level
-		Level level = levelConfig.GetLevel(currentLevel);
-		if (level.endlessMode || leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
-			return;
-		}
-		
-		// Check if any living enemies still on the scene
-		GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-		foreach(GameObject obj in objects) {
-			if (obj.layer == 9) { // "Enemy" layer
-				EnemyController enemyController = obj.GetComponent<EnemyController>();
-				if (enemyController.CurrState != EnemyController.EnemyState.DEAD) {
-					return;
-				}
-			}
-		}
-		
-		TriggerLevelComplete();
-	}
+        currentLevel++;
+        ResetGameState();
+    }
 
-	public int GetCurrentLives() {
-		return currentLives;
-	}
+    public void CheckIfLevelCompleted() {
+        // Checking if any pending enemies to be spawned or if this is an endless mode level
+        Level level = levelConfig.GetLevel(currentLevel);
+        if (level.endlessMode || leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
+            return;
+        }
 
-	public void DecrementCurrentLives() {
-		currentLives--;
-		UpdateGUI();
+        // Check if any living enemies still on the scene
+        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach(GameObject obj in objects) {
+            if (obj.layer == 9) { // "Enemy" layer
+                EnemyController enemyController = obj.GetComponent<EnemyController>();
+                if (enemyController.CurrState != EnemyController.EnemyState.DEAD) {
+                    return;
+                }
+            }
+        }
 
-		if (currentLives < 0) {
-			Invoke("StartEndGameState", endGameUiDelay);
-		}
-	}
+        TriggerLevelComplete();
+    }
 
-	public void AddToScore(int addPoints) {
-		score += addPoints;
-		UpdateGUI();
-	}
+    public int GetCurrentLives() {
+        return currentLives;
+    }
 
-	public void AddCoinCollected() {
-		coinsCollected++;
-	}
+    public void DecrementCurrentLives() {
+        currentLives--;
+        UpdateGUI();
 
-	/**
-	 * Stop playing the background music.
-	 */
-	public void StopBackgroundMusic() {
-		bgAudioSource.Stop();
-	}
+        if (currentLives < 0) {
+            Invoke("StartEndGameState", endGameUiDelay);
+        }
+    }
 
-	/**
-	 *  Start of the end game state after last life is lost.
-	 */
-	private void StartEndGameState() {
-		endGameUI.ShowEndGameMenu();
-		endGameUI.SetGameScoreUI(score);
-	}
+    public void AddToScore(int addPoints) {
+        score += addPoints;
+        UpdateGUI();
+    }
+
+    public void AddCoinCollected() {
+        coinsCollected++;
+    }
+
+    /**
+     * Stop playing the background music.
+     */
+    public void StopBackgroundMusic() {
+        bgAudioSource.Stop();
+    }
+
+    /**
+     *  Start of the end game state after last life is lost.
+     */
+    private void StartEndGameState() {
+        endGameUI.ShowEndGameMenu();
+        endGameUI.SetGameScoreUI(score);
+    }
 
 }
