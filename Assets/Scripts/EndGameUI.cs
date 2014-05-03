@@ -44,21 +44,23 @@ public class EndGameUI : MonoBehaviour {
         bool restartGame = false;
 
         foreach (Touch touch in Input.touches) {
-            if (touch.phase == TouchPhase.Began) {
+            if (touch.phase == TouchPhase.Ended) {
                 if (exitTouchButton.HitTest(touch.position)) {
                     exitGame = true;
+                    break;
                 }
                 else if (restartTouchButton.HitTest(touch.position)) {
                     restartGame = true;
+                    break;
                 }
             }
         }
 
         if (!exitGame && !restartGame) {
-            if (Input.GetButton("End Game Exit")) {
+            if (Input.GetButtonUp("End Game Exit")) {
                 exitGame = true;
             }
-            else if (Input.GetButton("End Game Restart")) {
+            else if (Input.GetButtonUp("End Game Restart")) {
                 restartGame = true;
             }
         }
@@ -68,7 +70,7 @@ public class EndGameUI : MonoBehaviour {
             Debug.Log("TODO: Implement game exit");
         }
         else if (restartGame) {
-            gameController.RestartGame();
+            gameController.StartGame();
         }
     }
 

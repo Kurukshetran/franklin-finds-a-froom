@@ -32,6 +32,11 @@ public class GameController : MonoBehaviour {
     // UI Text to to display level on intro
     public GameObject uiIntroLevel;
 
+    // Control button UI
+    public GameObject uiLeftButton;
+    public GameObject uiRightButton;
+    public GameObject uiJumpButton;
+
     // Level config container
     public GameObject levelConfigContainer;
 
@@ -117,8 +122,6 @@ public class GameController : MonoBehaviour {
 
         // Controls the end game UI
         endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
-
-        ResetGameState();
     }
 
     /**
@@ -137,8 +140,12 @@ public class GameController : MonoBehaviour {
         // Setup UI
         UpdateGUI();
 
-        // Show intro level UI
+        // Show in-game UI
         uiIntroLevel.SetActive(true);
+        uiScore.SetActive(true);
+        uiLeftButton.SetActive(true);
+        uiRightButton.SetActive(true);
+        uiJumpButton.SetActive(true);
 
         // +1 since it starts at 0
         uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
@@ -212,7 +219,7 @@ public class GameController : MonoBehaviour {
     /**
      * Set initial starting values after all lives have been lost and the game's restarting.
      */
-    public void RestartGame() {
+    public void StartGame() {
         currentLevel = startingLevel;
         currentLives = startingLives;
         score = 0;
