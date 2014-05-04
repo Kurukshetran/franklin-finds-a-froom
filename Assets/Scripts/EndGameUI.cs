@@ -9,6 +9,9 @@ public class EndGameUI : MonoBehaviour {
 
     #region Reference to other objects
     public GameController gameController;
+
+    // Home screen controller
+    public HomeScreenUI homeScreenUI;
     #endregion
 
     #region UI elements to hide
@@ -66,8 +69,8 @@ public class EndGameUI : MonoBehaviour {
         }
 
         if (exitGame) {
-            // @todo Implement game exit
-            Debug.Log("TODO: Implement game exit");
+            this.HideEndGameMenu();
+            homeScreenUI.ShowUI();
         }
         else if (restartGame) {
             gameController.StartGame();

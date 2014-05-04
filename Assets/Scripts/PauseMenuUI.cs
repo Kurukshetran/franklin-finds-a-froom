@@ -3,119 +3,237 @@ using System.Collections;
 
 public class PauseMenuUI : MonoBehaviour {
 
-	#region UI elements to hide
-	public GUITexture leftTouchButton;
-	public GUITexture rightTouchButton;
-	public GUITexture jumpTouchButton;
-	#endregion
+    #region Reference to other game objects
+    // Home screen controller
+    public HomeScreenUI homeScreenUI;
+    #endregion
 
-	#region Pause UI elements to show
-	public GUITexture pauseMenuBg;
-	public GUITexture exitTouchButton;
-	public GUITexture resumeTouchButton;
-	public GUITexture soundOffTouchButton;
-	public GUITexture soundOnTouchButton;
-	#endregion
+    #region UI elements to hide
+    public GUITexture leftTouchButton;
+    public GUITexture rightTouchButton;
+    public GUITexture jumpTouchButton;
+    public GameObject uiLevelIntro;
+    #endregion
 
-	// Flag tracking whether or not game is paused.
-	private bool isGamePaused;
+    #region Pause UI elements to show
+    public GUITexture pauseMenuBg;
+    public GUITexture exitTouchButton;
+    public GUITexture resumeTouchButton;
+    public GUITexture soundOffTouchButton;
+    public GUITexture soundOnTouchButton;
+    #endregion
 
-	private float savedTimeScale;
+    // Flag tracking whether or not game is paused.
+    private bool isGamePaused;
 
-	void Start() {
-		isGamePaused = false;
+    private float savedTimeScale;
 
-		// Set the width and height of the pause menu bg to match the screen size
-		if (pauseMenuBg != null) {
-			pauseMenuBg.guiTexture.pixelInset = new Rect(0, 0, Screen.width, Screen.height);
-		}
-	}
+    void Start() {
+        isGamePaused = false;
 
-	// Update is called once per frame
-	void Update () {
-		if (Input.GetButtonDown("Pause")) {
-			// Pause the game
-			if (!isGamePaused) {
-				isGamePaused = true;
+        // Set the width and height of the pause menu bg to match the screen size
+        if (pauseMenuBg != null) {
+            pauseMenuBg.guiTexture.pixelInset = new Rect(0, 0, Screen.width, Screen.height);
+        }
+    }
 
-				// Setting time scale to 0 for any components that rely on time to execute.
-				savedTimeScale = Time.timeScale;
-				Time.timeScale = 0;
+    // Update is called once per frame
+    void Update () {
+        if (Input.GetButtonUp("Pause")) {
+            // Pause the game
+            if (!isGamePaused) {
+                this.Pause();
+            }
+            // Unpause the game
+            else {
+                this.Unpause();
+            }
+        }
 
-				// Pause audio
-				AudioListener.pause = true;
+        // Check touches to the pause menu items
+        if (isGamePaused) {
+            bool endGame = false;
+            bool unpause = false;
+            bool unmute = false;
+            bool mute = false;
 
-				// Show the Pause Menu elements
-				pauseMenuBg.guiTexture.enabled = true;
-				exitTouchButton.guiTexture.enabled = true;
-				resumeTouchButton.guiTexture.enabled = true;
-				if (AudioListener.volume == 0) {
-					soundOffTouchButton.guiTexture.enabled = true;
-					soundOnTouchButton.guiTexture.enabled = false;
-				}
-				else {
-					soundOnTouchButton.guiTexture.enabled = true;
-					soundOffTouchButton.guiTexture.enabled = false;
-				}
+            foreach (Touch touch in Input.touches) {
+                if (touch.phase == TouchPhase.Ended) {
+                    if (exitTouchButton.HitTest(touch.position)) {
+                        endGame = true;
+                        break;
+                    }
+                    else if (resumeTouchButton.HitTest(touch.position)) {
+                        unpause = true;
+                        break;
+                    }
+                    else if (soundOffTouchButton.guiTexture.enabled && soundOffTouchButton.HitTest(touch.position)) {
+                        unmute = true;
+                        break;
+                    }
+                    else if (soundOnTouchButton.guiTexture.enabled && soundOnTouchButton.HitTest(touch.position)) {
+                        mute = true;
+                        break;
+                    }
+                }
+            }
 
-				// Hide the UI controls
-				leftTouchButton.guiTexture.enabled = false;
-				rightTouchButton.guiTexture.enabled = false;
-				jumpTouchButton.guiTexture.enabled = false;
-			}
-			// Unpause the game
-			else {
-				Unpause();
-			}
-		}
+            // If no touch events are detected, check for keyboard input.
+            if (!endGame && !unpause && !unmute && !mute) {
+                if (Input.GetButtonUp("End Game Exit")) {
+                    endGame = true;
+                }
+                else if (Input.GetButtonUp("Pause Menu Sound")) {
+                    if (soundOffTouchButton.guiTexture.enabled) {
+                        unmute = true;
+                    }
+                    else if (soundOnTouchButton.guiTexture.enabled) {
+                        mute = true;
+                    }
+                }
+            }
 
-		// Check touches to the pause menu items
-		if (isGamePaused) {
-			foreach (Touch touch in Input.touches) {
-				if (touch.phase == TouchPhase.Began) {
-					if (exitTouchButton.HitTest(touch.position)) {
+            if (endGame) {
+                // End game and return to home screen.
+                this.EndGame();
+            }
+            else if (unpause) {
+                // Resume gameplay.
+                this.Unpause();
+            }
+            else if (unmute) {
+                // Turn sound back on.
+                this.UnmuteSound();
+            }
+            else if (mute) {
+                // Turn sound off.
+                this.MuteSound();
+            }
+        }
+    }
 
-					}
-					else if (resumeTouchButton.HitTest(touch.position)) {
-						Unpause();
-					}
-					else if (soundOffTouchButton.guiTexture.enabled && soundOffTouchButton.HitTest(touch.position)) {
-						// Turn sound back on
-						AudioListener.volume = 1;
-						soundOffTouchButton.guiTexture.enabled = false;
-						soundOnTouchButton.guiTexture.enabled = true;
-					}
-					else if (soundOnTouchButton.guiTexture.enabled && soundOnTouchButton.HitTest(touch.position)) {
-						// Turn sound off
-						AudioListener.volume = 0;
-						soundOffTouchButton.guiTexture.enabled = true;
-						soundOnTouchButton.guiTexture.enabled = false;
-					}
-				}
-			}
-		}
-	}
+    /**
+     * Pause the game.
+     */
+    private void Pause() {
+        isGamePaused = true;
+        
+        // Setting time scale to 0 for any components that rely on time to execute.
+        savedTimeScale = Time.timeScale;
+        Time.timeScale = 0;
+        
+        // Pause audio
+        AudioListener.pause = true;
+        
+        // Show the Pause Menu elements
+        this.ShowMenuUI();
+        
+        // Hide the UI controls
+        this.HideControlsUI();
+    }
 
-	private void Unpause() {
-		isGamePaused = false;
-		
-		// Restore time scale
-		Time.timeScale = savedTimeScale;
-		
-		// Unpause audio
-		AudioListener.pause = false;
-		
-		// Hide the Pause Menu elements
-		pauseMenuBg.guiTexture.enabled = false;
-		exitTouchButton.guiTexture.enabled = false;
-		resumeTouchButton.guiTexture.enabled = false;
-		soundOffTouchButton.guiTexture.enabled = false;
-		soundOnTouchButton.guiTexture.enabled = false;
-		
-		// Show the UI controls
-		leftTouchButton.guiTexture.enabled = true;
-		rightTouchButton.guiTexture.enabled = true;
-		jumpTouchButton.guiTexture.enabled = true;
-	}
+    /**
+     * Unpause the game and resume gameplay.
+     */
+    private void Unpause() {
+        isGamePaused = false;
+        
+        // Restore time scale
+        Time.timeScale = savedTimeScale;
+        
+        // Unpause audio
+        AudioListener.pause = false;
+        
+        // Hide the Pause Menu elements
+        this.HideMenuUI();
+        
+        // Show the UI controls
+        this.ShowControlsUI();
+    }
+
+    /**
+     * Hide the UI for the game controls.
+     */
+    private void HideControlsUI() {
+        leftTouchButton.guiTexture.enabled = false;
+        rightTouchButton.guiTexture.enabled = false;
+        jumpTouchButton.guiTexture.enabled = false;
+
+        uiLevelIntro.SetActive(false);
+    }
+
+    /**
+     * Show the UI for the game controls.
+     */
+    private void ShowControlsUI() {
+        leftTouchButton.guiTexture.enabled = true;
+        rightTouchButton.guiTexture.enabled = true;
+        jumpTouchButton.guiTexture.enabled = true;
+    }
+
+    /**
+     * Hide the Pause Menu UI elements.
+     */
+    private void HideMenuUI() {
+        pauseMenuBg.guiTexture.enabled = false;
+        exitTouchButton.guiTexture.enabled = false;
+        resumeTouchButton.guiTexture.enabled = false;
+        soundOffTouchButton.guiTexture.enabled = false;
+        soundOnTouchButton.guiTexture.enabled = false;
+    }
+    
+    /**
+     * Show the Pause Menu UI elements.
+     */
+    private void ShowMenuUI() {
+        pauseMenuBg.guiTexture.enabled = true;
+        exitTouchButton.guiTexture.enabled = true;
+        resumeTouchButton.guiTexture.enabled = true;
+        if (AudioListener.volume == 0) {
+            soundOffTouchButton.guiTexture.enabled = true;
+            soundOnTouchButton.guiTexture.enabled = false;
+        }
+        else {
+            soundOnTouchButton.guiTexture.enabled = true;
+            soundOffTouchButton.guiTexture.enabled = false;
+        }
+    }
+
+    /**
+     *  Mute the sound and change UI if pause menu is open.
+     */
+    private void MuteSound() {
+        AudioListener.volume = 0;
+
+        if (isGamePaused) {
+            soundOffTouchButton.guiTexture.enabled = true;
+            soundOnTouchButton.guiTexture.enabled = false;
+        }
+    }
+
+    /**
+     * Unmute the sound and change UI if pause menu is open.
+     */
+    private void UnmuteSound() {
+        AudioListener.volume = 1;
+
+        if (isGamePaused) {
+            soundOffTouchButton.guiTexture.enabled = false;
+            soundOnTouchButton.guiTexture.enabled = true;
+        }
+    }
+
+    /**
+     * End the game and return to the home screen.
+     */
+    private void EndGame() {
+        isGamePaused = false;
+
+        // Hide gameplay UI elements
+        this.HideMenuUI();
+
+        // Show home screen
+        homeScreenUI.ShowUI();
+    }
 
 }
