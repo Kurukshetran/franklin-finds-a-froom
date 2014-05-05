@@ -12,9 +12,9 @@ public class PauseMenuUI : MonoBehaviour {
     #endregion
 
     #region UI elements to hide
-    public GUITexture leftTouchButton;
-    public GUITexture rightTouchButton;
-    public GUITexture jumpTouchButton;
+    public GameObject leftTouchButton;
+    public GameObject rightTouchButton;
+    public GameObject jumpTouchButton;
     public GameObject uiLevelIntro;
     #endregion
 
@@ -164,9 +164,9 @@ public class PauseMenuUI : MonoBehaviour {
      * Hide the UI for the game controls.
      */
     private void HideControlsUI() {
-        leftTouchButton.guiTexture.enabled = false;
-        rightTouchButton.guiTexture.enabled = false;
-        jumpTouchButton.guiTexture.enabled = false;
+        leftTouchButton.SetActive(false);
+        rightTouchButton.SetActive(false);
+        jumpTouchButton.SetActive(false);
 
         uiLevelIntro.SetActive(false);
     }
@@ -175,9 +175,9 @@ public class PauseMenuUI : MonoBehaviour {
      * Show the UI for the game controls.
      */
     private void ShowControlsUI() {
-        leftTouchButton.guiTexture.enabled = true;
-        rightTouchButton.guiTexture.enabled = true;
-        jumpTouchButton.guiTexture.enabled = true;
+        leftTouchButton.SetActive(true);
+        rightTouchButton.SetActive(true);
+        jumpTouchButton.SetActive(true);
     }
 
     /**

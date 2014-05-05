@@ -15,9 +15,9 @@ public class EndGameUI : MonoBehaviour {
     #endregion
 
     #region UI elements to hide
-    public GUITexture leftTouchButton;
-    public GUITexture rightTouchButton;
-    public GUITexture jumpTouchButton;
+    public GameObject leftTouchButton;
+    public GameObject rightTouchButton;
+    public GameObject jumpTouchButton;
     #endregion
 
     #region UI elements to show
@@ -89,9 +89,9 @@ public class EndGameUI : MonoBehaviour {
         isVisible = true;
 
         // Hide the control buttons
-        leftTouchButton.guiTexture.enabled = false;
-        rightTouchButton.guiTexture.enabled = false;
-        jumpTouchButton.guiTexture.enabled = false;
+        leftTouchButton.SetActive(false);
+        rightTouchButton.SetActive(false);
+        jumpTouchButton.SetActive(false);
 
         // Enable and show end game menu's UI
         gameOverUi.SetActive(true);
