@@ -29,6 +29,12 @@ public class HomeScreenUI : MonoBehaviour {
     #region Reference to other game objects
     // Game controller
     public GameController gameController;
+
+    // Audio to play on menu toggling.
+    public AudioClip toggleAudio;
+
+    // AUdio to play on menu selection.
+    public AudioClip selectAudio;
     #endregion
 
     void Awake() {
@@ -128,6 +134,8 @@ public class HomeScreenUI : MonoBehaviour {
         }
 
         menuSelect.guiText.text = menuSelectOptions[menuSelectIndex];
+
+        AudioSource.PlayClipAtPoint(toggleAudio, transform.position);
     }
 
     /**
@@ -141,12 +149,16 @@ public class HomeScreenUI : MonoBehaviour {
         }
 
         menuSelect.guiText.text = menuSelectOptions[menuSelectIndex];
+
+        AudioSource.PlayClipAtPoint(toggleAudio, transform.position);
     }
 
     /**
      * Select the currently selected menu item.
      */
     private void SelectMenuItem() {
+        AudioSource.PlayClipAtPoint(selectAudio, transform.position);
+
         // Not really elegant, but whatever for now.
         switch (menuSelectIndex) {
         case 0:
