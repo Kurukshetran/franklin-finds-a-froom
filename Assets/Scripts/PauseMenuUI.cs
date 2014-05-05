@@ -6,6 +6,9 @@ public class PauseMenuUI : MonoBehaviour {
     #region Reference to other game objects
     // Home screen controller
     public HomeScreenUI homeScreenUI;
+
+    // Game controller
+    public GameController gameController;
     #endregion
 
     #region UI elements to hide
@@ -28,7 +31,7 @@ public class PauseMenuUI : MonoBehaviour {
 
     private float savedTimeScale;
 
-    void Start() {
+    void Awake() {
         isGamePaused = false;
 
         // Set the width and height of the pause menu bg to match the screen size
@@ -39,7 +42,13 @@ public class PauseMenuUI : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        // Only allow for Puase menu controls to work if gameplay is in progress
+        if (gameController.GameState != GameController.FFGameState.InProgress) {
+            return;
+        }
+
         if (Input.GetButtonUp("Pause")) {
+            Debug.Log("game state: " + gameController.GameState);
             // Pause the game
             if (!isGamePaused) {
                 this.Pause();
@@ -227,13 +236,18 @@ public class PauseMenuUI : MonoBehaviour {
      * End the game and return to the home screen.
      */
     private void EndGame() {
-        isGamePaused = false;
+        // Unpause the game state
+        this.Unpause();
 
         // Hide gameplay UI elements
+        this.HideControlsUI();
         this.HideMenuUI();
 
         // Show home screen
         homeScreenUI.ShowUI();
+
+        // Allow GameController to clean up whatever it needs to clean up.
+        gameController.EndGame();
     }
 
 }

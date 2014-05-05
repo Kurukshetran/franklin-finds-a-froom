@@ -17,6 +17,17 @@ public class GameController : MonoBehaviour {
     public AudioSource bgAudioSource;
     public AudioClip bgMusic1;
     public AudioClip bgMusic2;
+
+    // Gameplay state
+    public enum FFGameState {
+        NotInGame,
+        InProgress,
+        Ended
+    };
+    private FFGameState gameState;
+    public FFGameState GameState {
+        get { return gameState; }
+    }
     #endregion
 
     #region Handlers to other GameObjects
@@ -122,6 +133,9 @@ public class GameController : MonoBehaviour {
 
         // Controls the end game UI
         endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
+
+        // Game hasn't started yet.
+        gameState = FFGameState.NotInGame;
     }
 
     /**
@@ -129,13 +143,7 @@ public class GameController : MonoBehaviour {
      */
     public void ResetGameState() {
         // Clear objects off the scene
-        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-        foreach(GameObject obj in objects) {
-            // 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
-            if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
-                Destroy(obj);
-            }
-        }
+        this.ClearNPCs();
 
         // Setup UI
         UpdateGUI();
@@ -220,12 +228,32 @@ public class GameController : MonoBehaviour {
      * Set initial starting values after all lives have been lost and the game's restarting.
      */
     public void StartGame() {
+        gameState = FFGameState.InProgress;
+
+        // Starting values
         currentLevel = startingLevel;
         currentLives = startingLives;
         score = 0;
 
         // PlayerController.Respawn() will also call GameController.ResetGameState()
         playerController.Respawn();
+    }
+
+    /**
+     * Handle anything that needs to be done when gameplay ends/exits.
+     */
+    public void EndGame() {
+        gameState = FFGameState.NotInGame;
+
+        // Stops music
+        this.StopBackgroundMusic();
+
+        // Stops spawning
+        leftSpawn.StopSpawning();
+        rightSpawn.StopSpawning();
+
+        // Removes any NPCs in the level
+        this.ClearNPCs();
     }
 
     private void UpdateGUI() {
@@ -299,8 +327,22 @@ public class GameController : MonoBehaviour {
      *  Start of the end game state after last life is lost.
      */
     private void StartEndGameState() {
+        gameState = FFGameState.Ended;
         endGameUI.ShowEndGameMenu();
         endGameUI.SetGameScoreUI(score);
+    }
+
+    /**
+     * Remove all the non-playable characters from the game.
+     */
+    private void ClearNPCs() {
+        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach(GameObject obj in objects) {
+            // 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
+            if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
+                Destroy(obj);
+            }
+        }
     }
 
 }

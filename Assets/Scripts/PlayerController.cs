@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
-        if (ignoreInput)
+        if (ignoreInput || gameController.GameState != GameController.FFGameState.InProgress)
             return;
 
         // Mobile touch screen support

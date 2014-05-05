@@ -69,10 +69,15 @@ public class EndGameUI : MonoBehaviour {
         }
 
         if (exitGame) {
+            // Handle the UI stuff
             this.HideEndGameMenu();
             homeScreenUI.ShowUI();
+
+            // Wrap up anything the GameController needs to wrap up.
+            gameController.EndGame();
         }
         else if (restartGame) {
+            this.HideEndGameMenu();
             gameController.StartGame();
         }
     }
