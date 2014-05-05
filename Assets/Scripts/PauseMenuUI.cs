@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PauseMenuUI : MonoBehaviour {
 
+    private static string SOUND_PREFS_KEY = "SOUND_PREFS";
+
     #region Reference to other game objects
     // Home screen controller
     public HomeScreenUI homeScreenUI;
@@ -218,6 +220,9 @@ public class PauseMenuUI : MonoBehaviour {
             soundOffTouchButton.guiTexture.enabled = true;
             soundOnTouchButton.guiTexture.enabled = false;
         }
+
+        // Save to PlayerPrefs
+        PlayerPrefs.SetInt(SOUND_PREFS_KEY, 0);
     }
 
     /**
@@ -230,6 +235,9 @@ public class PauseMenuUI : MonoBehaviour {
             soundOffTouchButton.guiTexture.enabled = false;
             soundOnTouchButton.guiTexture.enabled = true;
         }
+
+        // Save to PlayerPrefs
+        PlayerPrefs.SetInt(SOUND_PREFS_KEY, 1);
     }
 
     /**

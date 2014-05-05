@@ -3,6 +3,8 @@ using System.Collections;
 
 public class GameController : MonoBehaviour {
 
+    private static string SOUND_PREFS_KEY = "SOUND_PREFS";
+
     #region Public
     // Number of lives the player can start out with
     public int startingLives = 3;
@@ -136,6 +138,14 @@ public class GameController : MonoBehaviour {
 
         // Game hasn't started yet.
         gameState = FFGameState.NotInGame;
+
+        // Saved PlayerPrefs settings
+        if (PlayerPrefs.GetInt(SOUND_PREFS_KEY, 1) == 1) {
+            AudioListener.volume = 1;
+        }
+        else {
+            AudioListener.volume = 0;
+        }
     }
 
     /**
