@@ -240,6 +240,7 @@ public class PauseMenuUI : MonoBehaviour {
         this.Unpause();
 
         // Hide gameplay UI elements
+        this.HideControlsUI();
         this.HideMenuUI();
 
         // Show home screen

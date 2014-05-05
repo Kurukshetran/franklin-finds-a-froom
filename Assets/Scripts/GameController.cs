@@ -143,13 +143,7 @@ public class GameController : MonoBehaviour {
      */
     public void ResetGameState() {
         // Clear objects off the scene
-        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
-        foreach(GameObject obj in objects) {
-            // 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
-            if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
-                Destroy(obj);
-            }
-        }
+        this.ClearNPCs();
 
         // Setup UI
         UpdateGUI();
@@ -251,7 +245,15 @@ public class GameController : MonoBehaviour {
     public void EndGame() {
         gameState = FFGameState.NotInGame;
 
+        // Stops music
         this.StopBackgroundMusic();
+
+        // Stops spawning
+        leftSpawn.StopSpawning();
+        rightSpawn.StopSpawning();
+
+        // Removes any NPCs in the level
+        this.ClearNPCs();
     }
 
     private void UpdateGUI() {
@@ -328,6 +330,19 @@ public class GameController : MonoBehaviour {
         gameState = FFGameState.Ended;
         endGameUI.ShowEndGameMenu();
         endGameUI.SetGameScoreUI(score);
+    }
+
+    /**
+     * Remove all the non-playable characters from the game.
+     */
+    private void ClearNPCs() {
+        GameObject[] objects = FindObjectsOfType(typeof(GameObject)) as GameObject[];
+        foreach(GameObject obj in objects) {
+            // 9 = "Enemy" layer. 11 = "Pickup" layer. 12 = "Fire"
+            if (obj.layer == 9 || obj.layer == 11 || obj.layer == 12) {
+                Destroy(obj);
+            }
+        }
     }
 
 }
