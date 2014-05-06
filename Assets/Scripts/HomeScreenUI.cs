@@ -30,10 +30,13 @@ public class HomeScreenUI : MonoBehaviour {
     // Game controller
     public GameController gameController;
 
+    // Credits screen
+    public CreditsMenuUI creditsMenu;
+
     // Audio to play on menu toggling.
     public AudioClip toggleAudio;
 
-    // AUdio to play on menu selection.
+    // Audio to play on menu selection.
     public AudioClip selectAudio;
     #endregion
 
@@ -113,11 +116,17 @@ public class HomeScreenUI : MonoBehaviour {
 
     /**
      * Hide all home screen UI elements.
+     * 
+     * @param bool hideBg
+     *   Hide the background texture. Defaults to true.
      */
-    private void HideUI() {
+    private void HideUI(bool hideBg = true) {
         isVisible = false;
 
-        homeScreenBg.guiTexture.enabled = false;
+        if (hideBg) {
+            homeScreenBg.guiTexture.enabled = false;
+        }
+
         leftTouchButton.SetActive(false);
         rightTouchButton.SetActive(false);
         menuSelect.SetActive(false);
@@ -188,7 +197,12 @@ public class HomeScreenUI : MonoBehaviour {
      * Open the Credits screen.
      */
     private void Credits() {
-        Debug.Log("TODO: open the credits screen");
+        // Hide the home screen UI, but keep the background.
+        bool hideBg = false;
+        this.HideUI(hideBg);
+
+        // Show the Credits menu.
+        creditsMenu.ShowUI();
     }
 
     /**

@@ -49,8 +49,7 @@ public class PauseMenuUI : MonoBehaviour {
             return;
         }
 
-        if (Input.GetButtonUp("Pause")) {
-            Debug.Log("game state: " + gameController.GameState);
+        if (Input.GetButtonUp("Back")) {
             // Pause the game
             if (!isGamePaused) {
                 this.Pause();
