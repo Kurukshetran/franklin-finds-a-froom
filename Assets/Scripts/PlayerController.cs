@@ -268,6 +268,9 @@ public class PlayerController : MonoBehaviour {
         // Reset the level
         gameController.ResetGameState();
 
+        // Restart the background music
+        gameController.StartBackgroundMusic();
+
         // Re-enable input
         ignoreInput = false;
 

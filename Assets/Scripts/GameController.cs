@@ -177,25 +177,6 @@ public class GameController : MonoBehaviour {
         // Suspend any fire showers until level starts
         fireController.Suspend();
 
-        // Start the music
-        // Use bgMusic1 if on a level 3 or earlier.
-        if (currentLevel < 3) {
-            bgAudioSource.clip = bgMusic1;
-        }
-        // Randomly select the background music to play.
-        else {
-            System.Random random = new System.Random();
-            int randResult = random.Next(0, 2);
-            if (randResult == 1) {
-                bgAudioSource.clip = bgMusic1;
-            }
-            else {
-                bgAudioSource.clip = bgMusic2;
-            }
-        }
-        bgAudioSource.Play();
-
-
         // Start level
         Invoke("StartLevel", 2);
     }
@@ -324,6 +305,28 @@ public class GameController : MonoBehaviour {
 
     public void AddCoinCollected() {
         coinsCollected++;
+    }
+
+    /**
+     * Select and play the background music.
+     */
+    public void StartBackgroundMusic() {
+        // Use bgMusic1 if on level 3 or earlier.
+        if (currentLevel < 3) {
+            bgAudioSource.clip = bgMusic1;
+        }
+        // Randomly select the background music to play.
+        else {
+            System.Random random = new System.Random();
+            int randResult = random.Next(0, 2);
+            if (randResult == 1) {
+                bgAudioSource.clip = bgMusic1;
+            }
+            else {
+                bgAudioSource.clip = bgMusic2;
+            }
+        }
+        bgAudioSource.Play();
     }
 
     /**
