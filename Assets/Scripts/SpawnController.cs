@@ -87,6 +87,7 @@ public class SpawnController : MonoBehaviour {
         if (enemyController) {
             enemyController.SetDirection(directionToRight);
             enemyController.ResetProperties();
+            enemyController.speed = spawnConfig.speedModifier * enemyController.speed;
         }
         else {
             DirectionController dirController = spawnObj.GetComponent<DirectionController>();
