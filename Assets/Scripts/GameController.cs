@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour {
     public GameObject uiJumpButton;
 
     // Level config container
-    public GameObject levelConfigContainer;
+    public LevelConfig levelConfig;
 
     // Reference to the player
     public GameObject player;
@@ -81,7 +81,7 @@ public class GameController : MonoBehaviour {
     // Number of coins needed to add life
     private int coinsFor1Up = 10;
 
-    private LevelConfig levelConfig;
+    // Left side and right side spawn controllers
     private SpawnController leftSpawn;
     private SpawnController rightSpawn;
 
@@ -96,9 +96,6 @@ public class GameController : MonoBehaviour {
     #endregion
 
     void Awake() {
-        // Level config
-        levelConfig = levelConfigContainer.GetComponent<LevelConfig>();
-
         // Spawn points
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
         foreach(GameObject spawnPoint in spawnPoints) {
