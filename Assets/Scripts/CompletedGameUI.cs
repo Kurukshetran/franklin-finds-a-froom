@@ -113,9 +113,26 @@ public class CompletedGameUI : MonoBehaviour {
         // Set main text
         mainText.guiText.text = COMPLETED_TEXT;
 
+        // If scores are 0, display "000".
+        string strGameScore;
+        if (gameScore == 0) {
+            strGameScore = "000";
+        }
+        else {
+            strGameScore = gameScore.ToString();
+        }
+
+        string strHighScore;
+        if (highScore == 0) {
+            strHighScore = "000";
+        }
+        else {
+            strHighScore = highScore.ToString();
+        }
+
         // Set the score values
-        gameScoreUi.guiText.text = GAME_SCORE_TEXT + gameScore.ToString();
-        highScoreUi.guiText.text = HIGH_SCORE_TEXT + highScore.ToString();
+        gameScoreUi.guiText.text = GAME_SCORE_TEXT + strGameScore;
+        highScoreUi.guiText.text = HIGH_SCORE_TEXT + strHighScore;
     }
 
     /**
