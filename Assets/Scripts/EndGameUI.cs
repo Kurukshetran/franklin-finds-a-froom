@@ -3,8 +3,6 @@ using System.Collections;
 
 public class EndGameUI : MonoBehaviour {
 
-    private static string HIGH_SCORE_KEY = "HIGH_SCORE";
-
     private bool isVisible;
 
     #region Reference to other objects
@@ -120,7 +118,7 @@ public class EndGameUI : MonoBehaviour {
     /**
      * Set the text to show for the game score UI.
      */
-    public void SetGameScoreUI(int score) {
+    public void SetGameScoreUI(int score, int highScore) {
         // Current game score
         if (gameScoreUi && gameScoreUi.guiText) {
             string strScore;
@@ -132,14 +130,6 @@ public class EndGameUI : MonoBehaviour {
             }
 
             gameScoreUi.guiText.text = "Score: " + strScore;
-        }
-
-        // Overall high score
-        int highScore = PlayerPrefs.GetInt(HIGH_SCORE_KEY);
-        if (score > highScore) {
-            // Update the high score saved in PlayerPrefs
-            highScore = score;
-            PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
         }
 
         // Display to the UI

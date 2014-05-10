@@ -4,6 +4,7 @@ using System.Collections;
 public class GameController : MonoBehaviour {
 
     private static string SOUND_PREFS_KEY = "SOUND_PREFS";
+    private static string HIGH_SCORE_KEY = "HIGH_SCORE";
 
     #region Public
     // Number of lives the player can start out with
@@ -19,6 +20,9 @@ public class GameController : MonoBehaviour {
     public AudioSource bgAudioSource;
     public AudioClip bgMusic1;
     public AudioClip bgMusic2;
+
+    // Background music to play when game is completed.
+    public AudioClip bgMusicGameCompleted;
 
     // Gameplay state
     public enum FFGameState {
@@ -36,8 +40,11 @@ public class GameController : MonoBehaviour {
     // Container where the life icons will go
     public GameObject uiLivesContainer;
 
-    // Container for end game UI elements
-    public GameObject uiEndGameContainer;
+    // End game UI - when player loses all lives.
+    public EndGameUI endGameUI;
+
+    // Game completed UI - when player completes all levels.
+    public CompletedGameUI completedGameUI;
 
     // UI Text displaying score
     public GameObject uiScore;
@@ -51,7 +58,7 @@ public class GameController : MonoBehaviour {
     public GameObject uiJumpButton;
 
     // Level config container
-    public GameObject levelConfigContainer;
+    public LevelConfig levelConfig;
 
     // Reference to the player
     public GameObject player;
@@ -81,7 +88,7 @@ public class GameController : MonoBehaviour {
     // Number of coins needed to add life
     private int coinsFor1Up = 10;
 
-    private LevelConfig levelConfig;
+    // Left side and right side spawn controllers
     private SpawnController leftSpawn;
     private SpawnController rightSpawn;
 
@@ -90,15 +97,9 @@ public class GameController : MonoBehaviour {
 
     // Handle to LivesUI script
     private LivesUI livesUI;
-
-    // EndGameUI script
-    private EndGameUI endGameUI;
     #endregion
 
     void Awake() {
-        // Level config
-        levelConfig = levelConfigContainer.GetComponent<LevelConfig>();
-
         // Spawn points
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
         foreach(GameObject spawnPoint in spawnPoints) {
@@ -132,9 +133,6 @@ public class GameController : MonoBehaviour {
 
         // Starting coins
         coinsCollected = 0;
-
-        // Controls the end game UI
-        endGameUI = uiEndGameContainer.GetComponent<EndGameUI>();
 
         // Game hasn't started yet.
         gameState = FFGameState.NotInGame;
@@ -260,14 +258,23 @@ public class GameController : MonoBehaviour {
     private void TriggerLevelComplete() {
         Debug.Log("level complete. start next level.");
 
+        // Increment level counter
         currentLevel++;
-        ResetGameState();
+
+        // If there is no next level, show end game screen.
+        if (currentLevel >= levelConfig.levels.Length) {
+            Invoke("StartCompletedGameState", endGameUiDelay);
+        }
+        // Otherwise, reset game state to go onto next level.
+        else {
+            ResetGameState();
+        }
     }
 
     public void CheckIfLevelCompleted() {
         // Checking if any pending enemies to be spawned or if this is an endless mode level
         Level level = levelConfig.GetLevel(currentLevel);
-        if (level.endlessMode || leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
+        if ((level != null && level.endlessMode) || leftSpawn.GetNumPendingEnemies() > 0 || rightSpawn.GetNumPendingEnemies() > 0) {
             return;
         }
 
@@ -303,8 +310,35 @@ public class GameController : MonoBehaviour {
         UpdateGUI();
     }
 
+    /**
+     * Get the high score. Update if current score is greater than the high
+     * score saved in the PlayerPrefs.
+     */
+    public int GetHighScore() {
+        // Overall high score
+        int highScore = PlayerPrefs.GetInt(HIGH_SCORE_KEY);
+        if (score > highScore) {
+            // Update the high score saved in PlayerPrefs
+            highScore = score;
+            PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
+        }
+
+        return highScore;
+    }
+
     public void AddCoinCollected() {
         coinsCollected++;
+    }
+
+    /**
+     * Hide gameplay UI.
+     */
+    public void HideGameplayUI() {
+        uiIntroLevel.SetActive(false);
+        uiScore.SetActive(false);
+        uiLeftButton.SetActive(false);
+        uiRightButton.SetActive(false);
+        uiJumpButton.SetActive(false);
     }
 
     /**
@@ -337,12 +371,29 @@ public class GameController : MonoBehaviour {
     }
 
     /**
-     *  Start of the end game state after last life is lost.
+     * Start of the end game state after last life is lost.
      */
     private void StartEndGameState() {
         gameState = FFGameState.Ended;
         endGameUI.ShowEndGameMenu();
-        endGameUI.SetGameScoreUI(score);
+        endGameUI.SetGameScoreUI(score, this.GetHighScore());
+    }
+
+    /**
+     * Move into game completed state after all levels are completed.
+     */
+    private void StartCompletedGameState() {
+        gameState = FFGameState.Ended;
+
+        // Hide the gameplay UI elements (controls, lives, score, etc).
+        this.HideGameplayUI();
+
+        // Show the completed game UI.
+        completedGameUI.ShowUI(score, this.GetHighScore());
+
+        // Play game completed music
+        bgAudioSource.clip = bgMusicGameCompleted;
+        bgAudioSource.Play();
     }
 
     /**
