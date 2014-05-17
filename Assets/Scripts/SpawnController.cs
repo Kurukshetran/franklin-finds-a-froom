@@ -41,9 +41,6 @@ public class SpawnController : MonoBehaviour {
         // Copy endlessMode flag
         endlessMode = endless;
 
-        // Cancel any previous spawning
-        this.StopSpawning();
-
         // Get start delay time for the first element and SpawnNext() after that amount of time
         SpawnNext();
     }

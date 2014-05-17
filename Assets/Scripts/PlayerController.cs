@@ -243,7 +243,6 @@ public class PlayerController : MonoBehaviour {
     public void TriggerDeath() {
         // Play death audio
         AudioSource.PlayClipAtPoint(audioDeath, transform.position);
-        gameController.StopBackgroundMusic();
 
         // Trigger death animation
         animator.SetBool("Dead", true);
@@ -254,10 +253,11 @@ public class PlayerController : MonoBehaviour {
         // Set to a layer for enemies to not collide with
         gameObject.layer = 10; // "EnemyIgnore"
 
-        // Decrement number of current lives
-        gameController.DecrementCurrentLives();
+        // Handle anything on the game controller for player death.
+        gameController.OnPlayerDeath();
+
+        // Respawn after a few seconds if we still have remaining lives
         if (gameController.GetCurrentLives() >= 0) {
-            // Respawn after a few seconds if we still have remaining lives
             Invoke("Respawn", 4);
         }
     }

@@ -243,6 +243,9 @@ public class GameController : MonoBehaviour {
 
         // Removes any NPCs in the level
         this.ClearNPCs();
+
+        // Cancel any pending invoke calls.
+        CancelInvoke();
     }
 
     private void UpdateGUI() {
@@ -290,6 +293,21 @@ public class GameController : MonoBehaviour {
         }
 
         TriggerLevelComplete();
+    }
+
+    /**
+     * Make any updates necessary on player death.
+     */
+    public void OnPlayerDeath() {
+        // Stop the background music.
+        this.StopBackgroundMusic();
+
+        // Decrement the number of current lives.
+        this.DecrementCurrentLives();
+
+        // Stop spawning enemies
+        leftSpawn.StopSpawning();
+        rightSpawn.StopSpawning();
     }
 
     public int GetCurrentLives() {
