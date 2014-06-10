@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CompletedGameUI : MonoBehaviour {
 
-    private const string COMPLETED_TEXT = "Thanks for playing!\nMore levels coming soon...";
+    private const string COMPLETED_TEXT = "No more frooms!\nMore levels to come...";
     private const string GAME_SCORE_TEXT = "Game Score: ";
     private const string HIGH_SCORE_TEXT = "High Score: ";
 
