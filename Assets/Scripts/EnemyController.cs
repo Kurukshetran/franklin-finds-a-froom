@@ -154,16 +154,29 @@ public class EnemyController : MonoBehaviour {
 
 	protected virtual void SetDisabled() {
 		nextState = EnemyState.DISABLED_IMMUNE;
+
+        // Log enemy disabled state
+        string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Disabled";
+        GA.API.Design.NewEvent(evt, this.transform.position);
 	}
 
 	public virtual void OnBottomBump() {
 		// If boots are not equipped, then disable the character
 		if (!hasBoots) {
 			SetDisabled();
+
+            // Log enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Bump";
+            GA.API.Design.NewEvent(evt, this.transform.position);
+
 		}
 		// Otherwise, just simulate an upward bounce
 		else {
 			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
+
+            // Log failed enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":BumpBlocked";
+            GA.API.Design.NewEvent(evt, this.transform.position);
 		}
 
 		// Display particle effects and play audio only if in attackable state
@@ -199,12 +212,19 @@ public class EnemyController : MonoBehaviour {
 				// Using position of the stomp particle system to check if collision with player came from above or not.
 				// Also, if enemy is wearing the helmet, then trigger player death.
 				if (particleSysStomp.transform.position.y < coll.gameObject.transform.position.y && !hasHelmet) {
+                    // Log enemy stomped position
+                    string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Stomped";
+                    GA.API.Design.NewEvent(evt, this.transform.position);
+
 					OnStomped();
 
 					pc.OnEnemyStomp();
 				}
 				else {
-					pc.TriggerDeath();
+                    // Log player death, current level, and enemy type to analytics
+                    GA.API.Design.NewEvent("PlayerDeath:" + gameController.GetCurrentLevel() + ":" + this.name, pc.transform.position);
+					
+                    pc.TriggerDeath();
 				}
 			}
 		    else if (currState == EnemyState.DISABLED) {
@@ -224,6 +244,10 @@ public class EnemyController : MonoBehaviour {
 		AudioSource.PlayClipAtPoint(kickAudio, transform.position);
 
 		AddPoints(pointValue);
+
+        // Log enemy kill position
+        string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Killed";
+        GA.API.Design.NewEvent(evt, this.transform.position);
 		
 		Invoke("Destroy", 2);
 	}

@@ -72,11 +72,14 @@ public class EnemySpeedFroomController : EnemyController {
 					AudioSource.PlayClipAtPoint(hitAudio, transform.position);
 				}
 				else {
+                    // Log player death, current level, and enemy type to analytics
+                    GA.API.Design.NewEvent("PlayerDeath:" + gameController.GetCurrentLevel() + ":" + this.name, pc.transform.position);
+
 					pc.TriggerDeath();
 				}
 			}
 			else if (currState == EnemyState.DISABLED) {
-				base.KillEnemy();
+                base.KillEnemy();
 			}
 		}
 	}
@@ -95,10 +98,18 @@ public class EnemySpeedFroomController : EnemyController {
 			else if (currState == EnemyState.DOUBLE_SPEED) {
 				SetDisabled();
 			}
+
+            // Log enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Bump";
+            GA.API.Design.NewEvent(evt, this.transform.position);
 		}
 		// Otherwise, just simulate an upward bounce
 		else {
 			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
+
+            // Log failed enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":BumpBlocked";
+            GA.API.Design.NewEvent(evt, this.transform.position);
 		}
 
 		// Display particle effects and play audio only if in attackable state
@@ -146,8 +157,13 @@ public class EnemySpeedFroomController : EnemyController {
 			nextState = EnemyState.TRANSITION_TO_DOUBLE;
 
 			speed = speedIncreased;
-			if (base.animator)
+			if (base.animator) {
 				base.animator.SetBool("Angry", true);
+            }
+
+            // Log enemy angry state
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Angry";
+            GA.API.Design.NewEvent(evt, this.transform.position);
 		}
 		else {
 			currState = EnemyState.NORMAL;

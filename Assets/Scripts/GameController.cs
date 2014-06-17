@@ -188,6 +188,10 @@ public class GameController : MonoBehaviour {
 
         // Hide intro level UI
         uiIntroLevel.SetActive(false);
+
+        // GameAnalytics tracking
+        GA.API.Design.NewEvent("Level Started", currentLevel);
+        GA.API.Design.NewEvent("Lives At Level:" + currentLevel, currentLives);
     }
 
     /**
@@ -310,6 +314,10 @@ public class GameController : MonoBehaviour {
         rightSpawn.StopSpawning();
     }
 
+    public int GetCurrentLevel() {
+        return currentLevel;
+    }
+
     public int GetCurrentLives() {
         return currentLives;
     }
@@ -395,6 +403,9 @@ public class GameController : MonoBehaviour {
         gameState = FFGameState.Ended;
         endGameUI.ShowEndGameMenu();
         endGameUI.SetGameScoreUI(score, this.GetHighScore());
+
+        // Log high score
+        GA.API.Design.NewEvent("Score:OnDeath", this.GetHighScore());
     }
 
     /**
@@ -412,6 +423,9 @@ public class GameController : MonoBehaviour {
         // Play game completed music
         bgAudioSource.clip = bgMusicGameCompleted;
         bgAudioSource.Play();
+
+        // Log high score
+        GA.API.Design.NewEvent("Score:OnComplete", this.GetHighScore());
     }
 
     /**
