@@ -222,6 +222,9 @@ public class PauseMenuUI : MonoBehaviour {
 
         // Save to PlayerPrefs
         PlayerPrefs.SetInt(SOUND_PREFS_KEY, 0);
+
+        // GameAnalytics tracking
+        GA.API.Design.NewEvent("Preferences:MuteSound");
     }
 
     /**
@@ -237,6 +240,9 @@ public class PauseMenuUI : MonoBehaviour {
 
         // Save to PlayerPrefs
         PlayerPrefs.SetInt(SOUND_PREFS_KEY, 1);
+
+        // GameAnalytics tracking
+        GA.API.Design.NewEvent("Preferences:UnmuteSound");
     }
 
     /**

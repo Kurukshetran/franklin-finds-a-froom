@@ -3,165 +3,181 @@ using System.Collections;
 
 public class EnemySpeedFroomController : EnemyController {
 
-	// Speed of enemy in its normal state
-	public float speedInitial;
-	// Speed of enemy in its increased-speed state
-	public float speedIncreased;
+  // Speed of enemy in its normal state
+  public float speedInitial;
+  // Speed of enemy in its increased-speed state
+  public float speedIncreased;
 
-	// Time to transition from normal to double speed. This should probably match up with the animation transition.
-	public float timeTransitionToDouble = 0.5f;
+  // Time to transition from normal to double speed. This should probably match up with the animation transition.
+  public float timeTransitionToDouble = 0.5f;
 
-	// Internal timer used to track how long to stay in the transition state
-	private float transitionTimer;
+  // Internal timer used to track how long to stay in the transition state
+  private float transitionTimer;
 
-	private bool isPlayerColliding;
+  private bool isPlayerColliding;
 
-	protected override void Awake() {
-		base.Awake();
+  protected override void Awake() {
+    base.Awake();
 
-		isPlayerColliding = false;
-	}
+    isPlayerColliding = false;
+  }
 
-	protected override void Update() {
-		base.Update();
+  protected override void Update() {
+    base.Update();
 
-		if (currState == EnemyState.TRANSITION_TO_DOUBLE) {
-			transitionTimer -= Time.deltaTime;
+    if (currState == EnemyState.TRANSITION_TO_DOUBLE) {
+      transitionTimer -= Time.deltaTime;
 
-			if (transitionTimer <= 0) {
-				currState = EnemyState.DOUBLE_SPEED;
-				nextState = EnemyState.DOUBLE_SPEED;
-			}
-		}
-	}
+      if (transitionTimer <= 0) {
+        currState = EnemyState.DOUBLE_SPEED;
+        nextState = EnemyState.DOUBLE_SPEED;
+      }
+    }
+  }
 
-	protected override void FixedUpdate() {
-		base.FixedUpdate();
-	}
+  protected override void FixedUpdate() {
+    base.FixedUpdate();
+  }
 
-	protected override void OnCollisionEnter2D(Collision2D coll) {
-		if (coll.gameObject.tag == "Player" && !isPlayerColliding) {
-			// HACK :(  OnCollisionEnter2D gets called twice for the seemingly same collision. And OnCollisionExit2D somehow
-			// isn't getting called for the player object so I can't reset it there.
-			isPlayerColliding = true;
-			Invoke("ResetPlayerColliding", 0.1f);
+  protected override void OnCollisionEnter2D(Collision2D coll) {
+    if (coll.gameObject.tag == "Player" && !isPlayerColliding) {
+      // HACK :(  OnCollisionEnter2D gets called twice for the seemingly same collision. And OnCollisionExit2D somehow
+      // isn't getting called for the player object so I can't reset it there.
+      isPlayerColliding = true;
+      Invoke("ResetPlayerColliding", 0.1f);
 
-			if (currState == EnemyState.NORMAL || currState == EnemyState.DOUBLE_SPEED) {
-				PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
-				
-				// Using position of the stomp particle system to check if collision with player came from above or not
-				// Also, if enemy is wearing the helmet, then trigger player death.
-				if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y
-				    && !hasHelmet) {
-					if (currState == EnemyState.NORMAL) {
-						// On initial stomp, change to angry state to increase speed movement
-						ChangeStateToAngry(true);
-					}
-					else {
-						// On second stomp, place in the disabled state
-						SetDisabled();
-					}
+      if (currState == EnemyState.NORMAL || currState == EnemyState.DOUBLE_SPEED) {
+        PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
+        
+        // Using position of the stomp particle system to check if collision with player came from above or not
+        // Also, if enemy is wearing the helmet, then trigger player death.
+        if (base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y
+            && !hasHelmet) {
+          if (currState == EnemyState.NORMAL) {
+            // On initial stomp, change to angry state to increase speed movement
+            ChangeStateToAngry(true);
+          }
+          else {
+            // On second stomp, place in the disabled state
+            SetDisabled();
+          }
 
-					// Player behavior when it stomps on enemy
-					pc.OnEnemyStomp();
+          // Player behavior when it stomps on enemy
+          pc.OnEnemyStomp();
 
-					// Player the stomp particle system any time there's a stomp
-					base.particleSysStomp.Play();
+          // Player the stomp particle system any time there's a stomp
+          base.particleSysStomp.Play();
 
-					// Play audio for hit
-					AudioSource.PlayClipAtPoint(hitAudio, transform.position);
-				}
-				else {
-					pc.TriggerDeath();
-				}
-			}
-			else if (currState == EnemyState.DISABLED) {
-				base.KillEnemy();
-			}
-		}
-	}
+          // Play audio for hit
+          AudioSource.PlayClipAtPoint(hitAudio, transform.position);
+        }
+        else {
+                    // Log player death, current level, and enemy type to analytics
+                    GA.API.Design.NewEvent("PlayerDeath:" + gameController.GetCurrentLevel() + ":" + this.name, pc.transform.position);
 
-	/**
-	 * Triggered when enemy is bumped by ground from below.
-	 */
-	public override void OnBottomBump() {
-		// If boots are not equipped, then disable the character
-		if (!hasBoots) {
-			// On initial bump, change to angry state 
-			if (currState == EnemyState.NORMAL) {
-				ChangeStateToAngry(true);
-			}
-			// On second bump, disable the character
-			else if (currState == EnemyState.DOUBLE_SPEED) {
-				SetDisabled();
-			}
-		}
-		// Otherwise, just simulate an upward bounce
-		else {
-			rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
-		}
+          pc.TriggerDeath();
+        }
+      }
+      else if (currState == EnemyState.DISABLED) {
+                base.KillEnemy();
+      }
+    }
+  }
 
-		// Display particle effects and play audio only if in attackable state
-		if (currState != EnemyState.DISABLED && currState != EnemyState.DISABLED_IMMUNE) {
-			base.particleSysBump.Play();
+  /**
+   * Triggered when enemy is bumped by ground from below.
+   */
+  public override void OnBottomBump() {
+    // If boots are not equipped, then disable the character
+    if (!hasBoots) {
+      // On initial bump, change to angry state 
+      if (currState == EnemyState.NORMAL) {
+        ChangeStateToAngry(true);
+      }
+      // On second bump, disable the character
+      else if (currState == EnemyState.DOUBLE_SPEED) {
+        SetDisabled();
+      }
 
-			if (!hasBoots && base.hitAudio.isReadyToPlay) {
-				AudioSource.PlayClipAtPoint(base.hitAudio, transform.position);
-			}
-			else if(base.bumpBlockedAudio.isReadyToPlay) {
-				AudioSource.PlayClipAtPoint(base.bumpBlockedAudio, transform.position);
-			}
-		}
-	}
+            // Log enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Bump";
+            GA.API.Design.NewEvent(evt, this.transform.position);
+    }
+    // Otherwise, just simulate an upward bounce
+    else {
+      rigidbody2D.AddForce(new Vector2(0, bumpForceWithBoots));
 
-	protected void OnCollisionExit2D(Collision2D coll) {
-		// The Player collision exit somehow never gets triggered...
-		if (coll.gameObject.tag == "Player" && isPlayerColliding) {
-			isPlayerColliding = false;
-		}
-	}
+            // Log failed enemy bump
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":BumpBlocked";
+            GA.API.Design.NewEvent(evt, this.transform.position);
+    }
 
-	protected override void RecoverFromDisabled() {
-		base.RecoverFromDisabled();
+    // Display particle effects and play audio only if in attackable state
+    if (currState != EnemyState.DISABLED && currState != EnemyState.DISABLED_IMMUNE) {
+      base.particleSysBump.Play();
 
-		ChangeStateToAngry(true);
-	}
+      if (!hasBoots && base.hitAudio.isReadyToPlay) {
+        AudioSource.PlayClipAtPoint(base.hitAudio, transform.position);
+      }
+      else if(base.bumpBlockedAudio.isReadyToPlay) {
+        AudioSource.PlayClipAtPoint(base.bumpBlockedAudio, transform.position);
+      }
+    }
+  }
 
-	public override void ResetProperties() {
-		ChangeStateToAngry(false);
-	}
+  protected void OnCollisionExit2D(Collision2D coll) {
+    // The Player collision exit somehow never gets triggered...
+    if (coll.gameObject.tag == "Player" && isPlayerColliding) {
+      isPlayerColliding = false;
+    }
+  }
 
-	protected override void SetDisabled() {
-		base.SetDisabled();
+  protected override void RecoverFromDisabled() {
+    base.RecoverFromDisabled();
 
-		// Increase speed
-		speed = speedIncreased;
-	}
+    ChangeStateToAngry(true);
+  }
 
-	private void ChangeStateToAngry(bool beAngry) {
-		if (beAngry) {
-			transitionTimer = timeTransitionToDouble;
+  public override void ResetProperties() {
+    ChangeStateToAngry(false);
+  }
 
-			currState = EnemyState.TRANSITION_TO_DOUBLE;
-			nextState = EnemyState.TRANSITION_TO_DOUBLE;
+  protected override void SetDisabled() {
+    base.SetDisabled();
 
-			speed = speedIncreased;
-			if (base.animator)
-				base.animator.SetBool("Angry", true);
-		}
-		else {
-			currState = EnemyState.NORMAL;
-			nextState = EnemyState.NORMAL;
+    // Increase speed
+    speed = speedIncreased;
+  }
 
-			speed = speedInitial;
+  private void ChangeStateToAngry(bool beAngry) {
+    if (beAngry) {
+      transitionTimer = timeTransitionToDouble;
 
-			if (base.animator)
-				base.animator.SetBool("Angry", false);
-		}
-	}
+      currState = EnemyState.TRANSITION_TO_DOUBLE;
+      nextState = EnemyState.TRANSITION_TO_DOUBLE;
 
-	private void ResetPlayerColliding() {
-		isPlayerColliding = false;
-	}
+      speed = speedIncreased;
+      if (base.animator) {
+        base.animator.SetBool("Angry", true);
+            }
+
+            // Log enemy angry state
+            string evt = "Enemy:" + gameController.GetCurrentLevel() + ":" + this.name + ":Angry";
+            GA.API.Design.NewEvent(evt, this.transform.position);
+    }
+    else {
+      currState = EnemyState.NORMAL;
+      nextState = EnemyState.NORMAL;
+
+      speed = speedInitial;
+
+      if (base.animator)
+        base.animator.SetBool("Angry", false);
+    }
+  }
+
+  private void ResetPlayerColliding() {
+    isPlayerColliding = false;
+  }
 
 }

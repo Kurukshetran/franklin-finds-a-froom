@@ -25,8 +25,15 @@ public class FireballController : MonoBehaviour {
 	private int[] hitIds;
 	private int hitsDetected;
 
+    #region References to other game objects
+    private GameController gameController;
+    #endregion
+
 	private void Awake() {
 		anim = GetComponent<Animator>();
+
+        // GameController
+        gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 
 		// 8 for the number of platforms that can be hit
 		hitIds = new int[8];
@@ -58,6 +65,10 @@ public class FireballController : MonoBehaviour {
 	private void OnTriggerEnter2D(Collider2D other) {
 		if (other.gameObject.tag == "Player") {
 			PlayerController pc = other.gameObject.GetComponent<PlayerController>();
+
+            // Log player death, current level, and enemy type to analytics
+            GA.API.Design.NewEvent("PlayerDeath:" + gameController.GetCurrentLevel() + ":Fireball", pc.transform.position);
+
 			pc.TriggerDeath();
 		}
 		else if (other.gameObject.layer == 8) { // 8 = "Ground"
