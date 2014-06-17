@@ -80,7 +80,7 @@ public class GA_Request
 		#else
 		
 		//Set the authorization header to contain an MD5 hash of the JSON array string + the private key
-		Dictionary<string, string> headers = new Dictionary<string, string>();
+		Hashtable headers = new Hashtable();
 		headers.Add("Authorization", GA_Submit.CreateMD5Hash(requestInfo + GA.SettingsGA.ApiKey));
 		
 		//Try to send the data
@@ -145,7 +145,7 @@ public class GA_Request
 		#else
 		
 		//Set the authorization header to contain an MD5 hash of the JSON array string + the private key
-		Dictionary<string, string> headers = new Dictionary<string, string>();
+		Hashtable headers = new Hashtable();
 		headers.Add("Authorization", GA_Submit.CreateMD5Hash(requestInfo + GA.SettingsGA.ApiKey));
 		
 		//Try to send the data

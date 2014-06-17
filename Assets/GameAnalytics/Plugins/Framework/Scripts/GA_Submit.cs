@@ -302,7 +302,7 @@ public class GA_Submit
 		#else
 		
 		//Set the authorization header to contain an MD5 hash of the JSON array string + the private key
-		Dictionary<string, string> headers = new Dictionary<string, string>();
+        Hashtable headers = new Hashtable();
 		headers.Add("Authorization", jsonHash);
 		//headers.Add("Content-Length", data.Length.ToString());
 		

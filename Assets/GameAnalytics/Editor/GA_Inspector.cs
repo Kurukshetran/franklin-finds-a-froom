@@ -1326,7 +1326,7 @@ public class GA_Inspector : Editor
 
 	private static void GetGameInfo (GA_Settings ga)
 	{
-		Dictionary<string, string> headers = new Dictionary<string, string>();
+		Hashtable headers = new Hashtable();
 		headers.Add("X-Authorization", ga.TokenGA);
 
 		WWW www = new WWW("https://go.gameanalytics.com/v1/games/" + ga.Studios[ga.SelectedStudio-1].GameIDs[ga.SelectedGame-1], null, headers);
@@ -1512,7 +1512,7 @@ public class GA_Inspector : Editor
 
 	private static void GetUserData (GA_Settings ga)
 	{
-		Dictionary<string, string> headers = new Dictionary<string, string>();
+		Hashtable headers = new Hashtable();
 		headers.Add("X-Authorization", ga.TokenGA);
 		
 		WWW www = new WWW("https://go.gameanalytics.com/v1/user/data", null, headers);
