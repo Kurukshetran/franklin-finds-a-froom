@@ -85,5 +85,8 @@ public class CoinController : MonoBehaviour {
 		// Display and add the points
 		GameObject pointsText = (GameObject)Instantiate(pointsIndicator);
 		pointsText.GetComponent<PointsIndicator>().AddPoints(pointValue, transform.position);
+
+        // Notify game controller
+        gameController.AddCoinCollected();
 	}
 }
