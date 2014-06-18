@@ -82,6 +82,11 @@ public class PlayerController : MonoBehaviour {
 
         // Ignore user input until a respawn
         ignoreInput = true;
+
+        // There's no sprinting for touchscreen game, so make jump force always the max
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
+            walkJumpForce = runJumpForce;
+        }
     }
 
     void Update() {
