@@ -7,6 +7,9 @@ public class GameController : MonoBehaviour {
     private static string HIGH_SCORE_KEY = "HIGH_SCORE";
 
     #region Public
+    // Number of coins needed to add life
+    public static int coinsFor1Up = 5;
+
     // Number of lives the player can start out with
     public int startingLives = 3;
 
@@ -82,11 +85,8 @@ public class GameController : MonoBehaviour {
     // Total points accumulated
     private int score;
 
-    // Total # of coins collected
+    // Coins collected leading to next 1Up
     private int coinsCollected;
-
-    // Number of coins needed to add life
-    private int coinsFor1Up = 10;
 
     // Left side and right side spawn controllers
     private SpawnController leftSpawn;
@@ -255,6 +255,7 @@ public class GameController : MonoBehaviour {
     private void UpdateGUI() {
         if (livesUI) {
             livesUI.UpdateRemainingLives(currentLives);
+            livesUI.UpdateCoinCounter(coinsCollected);
         }
 
         if (uiScore && uiScore.guiText) {
@@ -352,8 +353,19 @@ public class GameController : MonoBehaviour {
         return highScore;
     }
 
+    /**
+     * Handler for a coin getting collected.
+     */
     public void AddCoinCollected() {
         coinsCollected++;
+
+        // Award new life and reset coin count
+        if (coinsCollected == coinsFor1Up) {
+            coinsCollected = 0;
+            currentLives++;
+        }
+
+        UpdateGUI();
     }
 
     /**
