@@ -55,6 +55,10 @@ public class GameController : MonoBehaviour {
     // UI Text to to display level on intro
     public GameObject uiIntroLevel;
 
+    // UI coin counter
+    public GUITexture uiCoinCounterIcon;
+    public GUIText uiCoinCounterText;
+
     // Control button UI
     public GameObject uiLeftButton;
     public GameObject uiRightButton;
@@ -162,6 +166,8 @@ public class GameController : MonoBehaviour {
         uiLeftButton.SetActive(true);
         uiRightButton.SetActive(true);
         uiJumpButton.SetActive(true);
+        uiCoinCounterIcon.enabled = true;
+        uiCoinCounterText.enabled = true;
 
         // +1 since it starts at 0
         uiIntroLevel.guiText.text = "Level " + (currentLevel + 1);
@@ -377,6 +383,8 @@ public class GameController : MonoBehaviour {
         uiLeftButton.SetActive(false);
         uiRightButton.SetActive(false);
         uiJumpButton.SetActive(false);
+        uiCoinCounterIcon.enabled = false;
+        uiCoinCounterText.enabled = false;
     }
 
     /**
