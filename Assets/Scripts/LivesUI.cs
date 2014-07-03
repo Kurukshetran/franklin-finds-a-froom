@@ -12,6 +12,9 @@ public class LivesUI : MonoBehaviour {
 	// Array of references to the instantiated icon objects
 	private GameObject[] iconRefs;
 
+    // Text displaying how many coins are collected and how many are needed until a new life
+    public GUIText coinCounterText;
+
 	/**
 	 * Update the # of icons shown on the screen
 	 */
@@ -44,4 +47,11 @@ public class LivesUI : MonoBehaviour {
 			iconRefs[i] = newIcon;
 		}
 	}
+
+    /**
+     * Update the coin counter.
+     */
+    public void UpdateCoinCounter(int coins) {
+        coinCounterText.text = coins + " / " + GameController.coinsFor1Up;
+    }
 }
