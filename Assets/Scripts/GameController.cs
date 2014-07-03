@@ -257,6 +257,9 @@ public class GameController : MonoBehaviour {
 
         // Cancel any pending invoke calls.
         CancelInvoke();
+
+        // Hide any gameplay UI elements
+        this.HideGameplayUI();
     }
 
     private void UpdateGUI() {
