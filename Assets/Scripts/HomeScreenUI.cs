@@ -18,6 +18,9 @@ public class HomeScreenUI : MonoBehaviour {
     // Background
     public GUITexture homeScreenBg;
 
+    // Title banner
+    public GUITexture homeScreenBanner;
+
     // Left/right buttons to cycle through menu options
     public GameObject leftTouchButton;
     public GameObject rightTouchButton;
@@ -109,6 +112,7 @@ public class HomeScreenUI : MonoBehaviour {
         isVisible = true;
 
         homeScreenBg.guiTexture.enabled = true;
+        homeScreenBanner.enabled = true;
         leftTouchButton.SetActive(true);
         rightTouchButton.SetActive(true);
         menuSelect.SetActive(true);
@@ -127,6 +131,7 @@ public class HomeScreenUI : MonoBehaviour {
             homeScreenBg.guiTexture.enabled = false;
         }
 
+        homeScreenBanner.enabled = false;
         leftTouchButton.SetActive(false);
         rightTouchButton.SetActive(false);
         menuSelect.SetActive(false);
