@@ -233,6 +233,7 @@ public class GameController : MonoBehaviour {
         currentLevel = startingLevel;
         currentLives = startingLives;
         score = 0;
+        coinsCollected = 0;
 
         // PlayerController.Respawn() will also call GameController.ResetGameState()
         playerController.Respawn();
