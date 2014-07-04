@@ -90,6 +90,9 @@ public class HomeScreenUI : MonoBehaviour {
             else if (Input.GetButtonUp("Return")) {
                 itemSelected = true;
             }
+            else if (Input.GetButtonUp("Back")) {
+                this.Exit();
+            }
         }
 
         // Change the item in the menu select.
