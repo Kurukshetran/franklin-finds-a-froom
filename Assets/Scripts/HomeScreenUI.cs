@@ -79,7 +79,7 @@ public class HomeScreenUI : MonoBehaviour {
             }
         }
 
-        // Check for keyboard input.
+        // Check for keyboard (or Android hardware button) input.
         if (!leftTouched && !rightTouched) {
             if (Input.GetButtonUp("Left")) {
                 leftTouched = true;
@@ -90,6 +90,7 @@ public class HomeScreenUI : MonoBehaviour {
             else if (Input.GetButtonUp("Return")) {
                 itemSelected = true;
             }
+            // Android back button.
             else if (Input.GetButtonUp("Back")) {
                 this.Exit();
             }
