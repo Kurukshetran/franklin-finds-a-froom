@@ -50,18 +50,20 @@ public class PointsIndicator : MonoBehaviour {
 
 		// Set the points to display
 		if (points > 0) {
+            float multiplier = level0Multiplier;
 			if (transform.position.y > level3YPos) {
-				points = Mathf.CeilToInt(points * level3Multiplier);
+                multiplier = level3Multiplier;
 			}
 			else if (transform.position.y > level2YPos) {
-				points = Mathf.CeilToInt(points * level2Multiplier);
+                multiplier = level2Multiplier;
 			}
 			else if (transform.position.y > level1YPos) {
-				points = Mathf.CeilToInt(points * level1Multiplier);
+                multiplier = level1Multiplier;
 			}
-			else if (transform.position.y > level0YPos) {
-				points = Mathf.CeilToInt(points * level0Multiplier);
-			}
+
+            // Rounding added points to the nearest 10s
+            points = (int)((points * multiplier) / 10);
+            points *= 10;
 
 			textMesh.text = "+" + points;
 		}

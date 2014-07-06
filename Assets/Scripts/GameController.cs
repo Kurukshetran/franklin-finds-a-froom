@@ -345,9 +345,6 @@ public class GameController : MonoBehaviour {
     public void AddToScore(int addPoints) {
         score += addPoints;
 
-        // So... the score's accuracy occasionally goes off. Rounding to nearest 10 to fix.
-        score = ((int)(score / 10)) * 10;
-
         UpdateGUI();
     }
 
