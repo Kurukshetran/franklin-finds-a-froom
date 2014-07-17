@@ -9,9 +9,6 @@ public class SpawnController : MonoBehaviour {
     // If true, randomize the type of enemy spawned.
     public bool randomizeEnemies = false;
 
-    // Array of enemy prefabs to spawn.
-    private SpawnConfig[] initialSpawns;
-
     // Array of enemies that are yet to be spawned into the level.
     private SpawnConfig[] pendingSpawns;
 
@@ -30,9 +27,7 @@ public class SpawnController : MonoBehaviour {
      * @param endless Endless mode flag'
      */
     public void Setup(SpawnConfig[] spawnConfigs, float delay, bool endless) {
-        // Copy configs to both initialSpawns = used for endless mode, and pendingSpawns which is actively used to track
-        // upcoming spawns.
-        initialSpawns = spawnConfigs;
+        // Use pendingSpawns to track upcoming spawns
         pendingSpawns = spawnConfigs;
 
         // Time delay for respawns
