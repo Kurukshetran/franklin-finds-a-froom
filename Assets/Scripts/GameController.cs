@@ -59,6 +59,9 @@ public class GameController : MonoBehaviour {
     public GUITexture uiCoinCounterIcon;
     public GUIText uiCoinCounterText;
 
+    // UI pause button
+    public GUITexture uiPauseButton;
+
     // Control button UI
     public GameObject uiLeftButton;
     public GameObject uiRightButton;
@@ -166,6 +169,7 @@ public class GameController : MonoBehaviour {
         uiLeftButton.SetActive(true);
         uiRightButton.SetActive(true);
         uiJumpButton.SetActive(true);
+        uiPauseButton.enabled = true;
         uiCoinCounterIcon.enabled = true;
         uiCoinCounterText.enabled = true;
 
@@ -388,6 +392,7 @@ public class GameController : MonoBehaviour {
         uiLeftButton.SetActive(false);
         uiRightButton.SetActive(false);
         uiJumpButton.SetActive(false);
+        uiPauseButton.enabled = false;
         uiCoinCounterIcon.enabled = false;
         uiCoinCounterText.enabled = false;
     }

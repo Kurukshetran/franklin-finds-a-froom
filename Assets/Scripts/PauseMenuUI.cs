@@ -14,6 +14,8 @@ public class PauseMenuUI : MonoBehaviour {
     #endregion
 
     #region UI elements to hide
+    public GUITexture pauseTouchButton;
+
     public GameObject leftTouchButton;
     public GameObject rightTouchButton;
     public GameObject jumpTouchButton;
@@ -60,8 +62,16 @@ public class PauseMenuUI : MonoBehaviour {
             }
         }
 
+        // Check touches to the on-screen pause button
+        if (!isGamePaused) {
+            foreach (Touch touch in Input.touches) {
+                if (touch.phase == TouchPhase.Ended && pauseTouchButton.HitTest(touch.position)) {
+                    this.Pause();
+                }
+            }
+        }
         // Check touches to the pause menu items
-        if (isGamePaused) {
+        else {
             bool endGame = false;
             bool unpause = false;
             bool unmute = false;
@@ -139,7 +149,7 @@ public class PauseMenuUI : MonoBehaviour {
         this.ShowMenuUI();
         
         // Hide the UI controls
-        this.HideControlsUI();
+        this.HideGameUI();
     }
 
     /**
@@ -158,27 +168,31 @@ public class PauseMenuUI : MonoBehaviour {
         this.HideMenuUI();
         
         // Show the UI controls
-        this.ShowControlsUI();
+        this.ShowGameUI();
     }
 
     /**
-     * Hide the UI for the game controls.
+     * Hide the UI for the game controls and other in-game elements.
      */
-    private void HideControlsUI() {
+    private void HideGameUI() {
         leftTouchButton.SetActive(false);
         rightTouchButton.SetActive(false);
         jumpTouchButton.SetActive(false);
 
         uiLevelIntro.SetActive(false);
+
+        pauseTouchButton.enabled = false;
     }
 
     /**
-     * Show the UI for the game controls.
+     * Show the UI for the game controls and other in-game elements.
      */
-    private void ShowControlsUI() {
+    private void ShowGameUI() {
         leftTouchButton.SetActive(true);
         rightTouchButton.SetActive(true);
         jumpTouchButton.SetActive(true);
+
+        pauseTouchButton.enabled = true;
     }
 
     /**
@@ -253,7 +267,7 @@ public class PauseMenuUI : MonoBehaviour {
         this.Unpause();
 
         // Hide gameplay UI elements
-        this.HideControlsUI();
+        this.HideGameUI();
         this.HideMenuUI();
 
         // Show home screen
