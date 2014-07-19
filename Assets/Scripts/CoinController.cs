@@ -29,6 +29,8 @@ public class CoinController : MonoBehaviour {
 
   private float pickupFinalYPos;
 
+  private float pickupTimeRemaining = 1;
+
   private void Awake() {
     gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
   }
@@ -40,9 +42,13 @@ public class CoinController : MonoBehaviour {
     rigidbody2D.velocity = new Vector2(transform.localScale.x * velocity, rigidbody2D.velocity.y);
 
     if (doPickup) {
+      // Kinda hacky, but keeping this timer to also ensure coin gets destroyed
+      // if it doesn't do the pickup movement in the right direction.
+      pickupTimeRemaining -= Time.deltaTime;
+
       // If the position of the coin not within some threshold, then continue animating
       float deltaY = Mathf.Abs(pickupFinalYPos - transform.position.y);
-      if (deltaY > 0.25) {
+      if (deltaY > 0.25 && pickupTimeRemaining > 0) {
         float incrementalY = Mathf.Lerp(transform.position.y, pickupFinalYPos, Time.deltaTime * smoothingValue);
         transform.position = new Vector3(transform.position.x, incrementalY, transform.position.z);
       }
