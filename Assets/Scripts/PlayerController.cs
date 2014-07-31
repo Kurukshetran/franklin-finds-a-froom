@@ -92,7 +92,7 @@ public class PlayerController : MonoBehaviour {
             walkJumpForce = runJumpForce;
         }
 
-        isImmune = true;
+        SetIsImmune(true);
     }
 
     void Update() {
@@ -296,7 +296,9 @@ public class PlayerController : MonoBehaviour {
         ignoreInput = false;
         
         // Reset layer to allow enemy collisions
-        gameObject.layer = 13; // "Player"
+        if (!isImmune) {
+            gameObject.layer = 13; // "Player"
+        }
         
         // Reset camera position
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -306,6 +308,14 @@ public class PlayerController : MonoBehaviour {
 
     public void SetIsImmune(bool isImmune) {
         this.isImmune = isImmune;
+
+        // Set physics layer to control if enemies collide with player or not.
+        if (this.isImmune) {
+            gameObject.layer = 10; // "EnemyIgnore"
+        }
+        else {
+            gameObject.layer = 13; // "Player"
+        }
     }
 
 }
