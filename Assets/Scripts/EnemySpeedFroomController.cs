@@ -84,6 +84,24 @@ public class EnemySpeedFroomController : EnemyController {
     }
   }
 
+    protected void OnCollisionStay2D(Collision2D coll) {
+        if (coll.gameObject.tag == "Player") {
+            if (currState == EnemyState.DOUBLE_SPEED
+                && base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y
+                && !hasHelmet) {
+
+                PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
+                SetDisabled();
+                pc.OnEnemyStomp();
+                base.particleSysStomp.Play();
+                AudioSource.PlayClipAtPoint(hitAudio, transform.position);
+            }
+            else if (currState == EnemyState.DISABLED) {
+                base.KillEnemy();
+            }
+        }
+    }
+
   /**
    * Triggered when enemy is bumped by ground from below.
    */
