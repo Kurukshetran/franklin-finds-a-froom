@@ -156,9 +156,10 @@ public class GameController : MonoBehaviour {
     /**
      * Reset the state of the level. Includes clearing the enemies off the screen and resetting the UI.
      */
-    public void ResetGameState() {
+    public void ResetGameState(bool isStartingLevel) {
         // Clear objects off the scene
-        this.ClearNPCs();
+        if (isStartingLevel)
+            this.ClearNPCs();
 
         // Setup UI
         UpdateGUI();
@@ -182,11 +183,16 @@ public class GameController : MonoBehaviour {
         // Move player to beginning state
         player.transform.position = playerStartingPosition;
 
-        // Suspend any fire showers until level starts
-        fireController.Suspend();
+        if (isStartingLevel) {
+            // Suspend any fire showers until level starts
+            fireController.Suspend();
 
-        // Start level
-        Invoke("StartLevel", 2);
+            // Start level
+            Invoke("StartLevel", 2);
+        }
+        else {
+            Invoke("ContinueLevel", 2);
+        }
     }
 
     private void StartLevel() {
@@ -202,6 +208,14 @@ public class GameController : MonoBehaviour {
         // GameAnalytics tracking
         GA.API.Design.NewEvent("Level Started", currentLevel);
         GA.API.Design.NewEvent("Lives At Level:" + currentLevel, currentLives);
+    }
+
+    private void ContinueLevel() {
+        uiIntroLevel.SetActive(false);
+
+        // GameAnalytics tracking
+        GA.API.Design.NewEvent("Level Continued", currentLevel);
+        GA.API.Design.NewEvent("Lives At Level (continued):" + currentLevel, currentLives);
     }
 
     /**
@@ -240,7 +254,7 @@ public class GameController : MonoBehaviour {
         coinsCollected = 0;
 
         // PlayerController.Respawn() will also call GameController.ResetGameState()
-        playerController.Respawn();
+        playerController.Respawn(true, 0);
     }
 
     /**
@@ -289,7 +303,7 @@ public class GameController : MonoBehaviour {
         }
         // Otherwise, reset game state to go onto next level.
         else {
-            ResetGameState();
+            ResetGameState(true);
         }
     }
 
@@ -323,10 +337,6 @@ public class GameController : MonoBehaviour {
 
         // Decrement the number of current lives.
         this.DecrementCurrentLives();
-
-        // Stop spawning enemies
-        leftSpawn.StopSpawning();
-        rightSpawn.StopSpawning();
     }
 
     public int GetCurrentLevel() {

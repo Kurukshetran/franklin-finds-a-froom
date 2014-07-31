@@ -70,6 +70,8 @@ public class PlayerController : MonoBehaviour {
     private bool ignoreInput;
 
     private bool isRunning;
+
+    private bool isRespawnAtLevelStart;
     #endregion
 
     void Awake() {
@@ -263,28 +265,34 @@ public class PlayerController : MonoBehaviour {
 
         // Respawn after a few seconds if we still have remaining lives
         if (gameController.GetCurrentLives() >= 0) {
-            Invoke("Respawn", 4);
+            Respawn(false, 4f);
         }
     }
 
-    public void Respawn() {
+    public void Respawn(bool isStartingLevel, float delay) {
+        isRespawnAtLevelStart = isStartingLevel;
+        Invoke("_respawn", delay);
+    }
+
+    private void _respawn() {
         animator.SetBool("Dead", false);
-
+        
         // Reset the level
-        gameController.ResetGameState();
-
+        gameController.ResetGameState(isRespawnAtLevelStart);
+        
         // Restart the background music
         gameController.StartBackgroundMusic();
-
+        
         // Re-enable input
         ignoreInput = false;
-
+        
         // Reset layer to allow enemy collisions
         gameObject.layer = 13; // "Player"
-
+        
         // Reset camera position
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
         CameraController cameraController = camera.GetComponent<CameraController>();
         cameraController.ResetPosition();
     }
+
 }
