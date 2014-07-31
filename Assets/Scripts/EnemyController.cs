@@ -74,6 +74,8 @@ public class EnemyController : MonoBehaviour {
   
   protected EnemyState currState = EnemyState.NORMAL;
   protected EnemyState nextState = EnemyState.NORMAL;
+
+    protected bool isPlayerColliding;
   #endregion
 
   protected virtual void Awake() {
@@ -205,7 +207,12 @@ public class EnemyController : MonoBehaviour {
   }
 
   protected virtual void OnCollisionEnter2D(Collision2D coll) {
-    if (coll.gameObject.tag == "Player") {
+    if (coll.gameObject.tag == "Player" && !isPlayerColliding) {
+        // HACK :(  OnCollisionEnter2D gets called twice for the seemingly same collision. And OnCollisionExit2D somehow
+        // isn't getting called for the player object so I can't reset it there.
+        isPlayerColliding = true;
+        Invoke("ResetPlayerColliding", 0.1f);
+
         if (currState == EnemyState.NORMAL) {
         PlayerController pc = coll.gameObject.GetComponent<PlayerController>();
 
@@ -232,6 +239,16 @@ public class EnemyController : MonoBehaviour {
       }
     }
   }
+
+    protected virtual void OnCollisionStay2D(Collision2D coll) {
+        if (coll.gameObject.tag == "Player" && currState == EnemyState.DISABLED) {
+            KillEnemy();
+        }
+    }
+
+    protected void ResetPlayerColliding() {
+        isPlayerColliding = false;
+    }
 
   protected virtual void KillEnemy() {
     collider2D.enabled = false;

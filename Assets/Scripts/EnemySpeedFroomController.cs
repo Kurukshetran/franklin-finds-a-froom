@@ -14,8 +14,6 @@ public class EnemySpeedFroomController : EnemyController {
   // Internal timer used to track how long to stay in the transition state
   private float transitionTimer;
 
-  private bool isPlayerColliding;
-
   protected override void Awake() {
     base.Awake();
 
@@ -84,7 +82,9 @@ public class EnemySpeedFroomController : EnemyController {
     }
   }
 
-    protected void OnCollisionStay2D(Collision2D coll) {
+    protected override void OnCollisionStay2D(Collision2D coll) {
+        base.OnCollisionStay2D(coll);
+
         if (coll.gameObject.tag == "Player") {
             if (currState == EnemyState.DOUBLE_SPEED
                 && base.particleSysStomp.transform.position.y < coll.gameObject.transform.position.y
@@ -95,9 +95,6 @@ public class EnemySpeedFroomController : EnemyController {
                 pc.OnEnemyStomp();
                 base.particleSysStomp.Play();
                 AudioSource.PlayClipAtPoint(hitAudio, transform.position);
-            }
-            else if (currState == EnemyState.DISABLED) {
-                base.KillEnemy();
             }
         }
     }
@@ -192,10 +189,6 @@ public class EnemySpeedFroomController : EnemyController {
       if (base.animator)
         base.animator.SetBool("Angry", false);
     }
-  }
-
-  private void ResetPlayerColliding() {
-    isPlayerColliding = false;
   }
 
 }
