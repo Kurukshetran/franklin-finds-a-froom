@@ -183,6 +183,9 @@ public class GameController : MonoBehaviour {
         // Move player to beginning state
         player.transform.position = playerStartingPosition;
 
+        // Player is immune for the couple seconds before a level starts.
+        playerController.SetIsImmune(true);
+
         if (isStartingLevel) {
             // Suspend any fire showers until level starts
             fireController.Suspend();
@@ -205,6 +208,9 @@ public class GameController : MonoBehaviour {
         // Hide intro level UI
         uiIntroLevel.SetActive(false);
 
+        // Remove immunity
+        playerController.SetIsImmune(false);
+
         // GameAnalytics tracking
         GA.API.Design.NewEvent("Level Started", currentLevel);
         GA.API.Design.NewEvent("Lives At Level:" + currentLevel, currentLives);
@@ -212,6 +218,9 @@ public class GameController : MonoBehaviour {
 
     private void ContinueLevel() {
         uiIntroLevel.SetActive(false);
+
+        // Remove immunity
+        playerController.SetIsImmune(false);
 
         // GameAnalytics tracking
         GA.API.Design.NewEvent("Level Continued", currentLevel);

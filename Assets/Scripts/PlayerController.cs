@@ -72,6 +72,8 @@ public class PlayerController : MonoBehaviour {
     private bool isRunning;
 
     private bool isRespawnAtLevelStart;
+
+    private bool isImmune;
     #endregion
 
     void Awake() {
@@ -89,6 +91,8 @@ public class PlayerController : MonoBehaviour {
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer) {
             walkJumpForce = runJumpForce;
         }
+
+        isImmune = true;
     }
 
     void Update() {
@@ -248,6 +252,11 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void TriggerDeath() {
+        // If player is immune, cannot die.
+        if (isImmune) {
+            return;
+        }
+
         // Play death audio
         AudioSource.PlayClipAtPoint(audioDeath, transform.position);
 
@@ -293,6 +302,10 @@ public class PlayerController : MonoBehaviour {
         GameObject camera = GameObject.FindGameObjectWithTag("MainCamera");
         CameraController cameraController = camera.GetComponent<CameraController>();
         cameraController.ResetPosition();
+    }
+
+    public void SetIsImmune(bool isImmune) {
+        this.isImmune = isImmune;
     }
 
 }
