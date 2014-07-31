@@ -25,6 +25,8 @@ public class FireballController : MonoBehaviour {
 	private int[] hitIds;
 	private int hitsDetected;
 
+    private float speed;
+
     #region References to other game objects
     private GameController gameController;
     #endregion
@@ -38,6 +40,8 @@ public class FireballController : MonoBehaviour {
 		// 8 for the number of platforms that can be hit
 		hitIds = new int[8];
 		hitsDetected = 0;
+
+        burnoutTimer = 0;
 	}
 
 	private void Start() {
@@ -60,6 +64,10 @@ public class FireballController : MonoBehaviour {
 				anim.SetBool("Burnout1", true);
 			}
 		}
+        else {
+            float newY = transform.position.y - (this.speed * Time.deltaTime);
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        }
 	}
 
 	private void OnTriggerEnter2D(Collider2D other) {
@@ -79,11 +87,7 @@ public class FireballController : MonoBehaviour {
 				System.Random rand = new System.Random();
 				double num = rand.NextDouble();
 				if (num < groundCollidePercent) {
-
-					// Stop fireball's movement
-					rigidbody2D.gravityScale = 0;
-
-					// Change its animation
+                    // Change its animation
 					anim.SetBool("Ground", true);
 
 					// Start burnout timer
@@ -107,4 +111,8 @@ public class FireballController : MonoBehaviour {
 		hitIds[hitsDetected] = id;
 		hitsDetected++;
 	}
+
+    public void SetSpeed(float speed) {
+        this.speed = speed;
+    }
 }

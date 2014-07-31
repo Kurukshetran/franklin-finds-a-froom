@@ -89,7 +89,7 @@ public class FireShowerController : MonoBehaviour {
             float yPos = transform.position.y + deltaY;
             obj.transform.position = new Vector3(xPos, yPos, transform.position.z);
 
-            obj.rigidbody2D.gravityScale = config.gravityScale;
+            obj.GetComponent<FireballController>().SetSpeed(config.speed);
         }
 
         // If there's another shower, start the timer for it

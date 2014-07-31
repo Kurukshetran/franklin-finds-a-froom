@@ -36,5 +36,5 @@ public class SpawnConfig {
 public class FireShower {
     public int numFireballs;
     public float startDelay;
-    public float gravityScale;
+    public float speed;
 }
