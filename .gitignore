@@ -17,3 +17,4 @@ Library/ScriptMapper
 Temp/
 Assets/Sprites
 Assets/Sounds
+*.keystore
